@@ -1,0 +1,17 @@
+{
+  "name": "plainfold-skeleton-spike",
+  "private": true,
+  "type": "module",
+  "description": "Deterministic story skeleton for the bookshelf sample, no LLM. Throwaway spike before the Rust core.",
+  "scripts": {
+    "extract": "node src/extract.ts ../../samples/bookshelf out/bookshelf.model.json",
+    "render": "node src/render.ts out/bookshelf.model.json out/home.html",
+    "home": "npm run extract && npm run render"
+  },
+  "dependencies": {
+    "typescript": "5.9.3"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.0"
+  }
+}

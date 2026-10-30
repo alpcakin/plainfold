@@ -1,0 +1,627 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>plainfold skeleton</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: the plainfold terminal page. Diagram in the middle, details on the right, findings under the diagram.
+   Boxes only inside the diagram; hierarchy from weight, color, indentation and a few hairlines. */
+:root{
+  --bg:#fbfbfa; --fg:#1f2328; --fg-2:#59616b; --fg-3:#959ba3; --rule:#e6e7e9; --box:#f3f4f6; --box-line:#d6d9de;
+  --frame:rgba(31,35,40,.028); --accent:#2f5ccc; --warn:#c2362b; --ok:#2e7d50; --hl:rgba(47,92,204,.10);
+  --c-kw:#9a3fbf; --c-str:#2a7a3f; --c-num:#b5541a; --c-fn:#2c5fc4; --c-cm:#959ba3;
+  --nest1:#f2f5fb; --nest2:#e9eef9; --nest3:#e0e7f6;
+  --mono:"Geist Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#15171b; --fg:#e4e6ea; --fg-2:#a7aeb7; --fg-3:#6b727c; --rule:#2a2e35; --box:#1f2228; --box-line:#363b45;
+  --frame:rgba(255,255,255,.03); --accent:#8ea6ff; --warn:#f07b6f; --ok:#6cc18c; --hl:rgba(142,166,255,.13);
+  --c-kw:#c792ea; --c-str:#a5d6a7; --c-num:#f0a46c; --c-fn:#82aaff; --c-cm:#6b727c; --nest1:#1a1e27; --nest2:#1e2330; --nest3:#232a3b; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#15171b; --fg:#e4e6ea; --fg-2:#a7aeb7; --fg-3:#6b727c; --rule:#2a2e35; --box:#1f2228; --box-line:#363b45;
+  --frame:rgba(255,255,255,.03); --accent:#8ea6ff; --warn:#f07b6f; --ok:#6cc18c; --hl:rgba(142,166,255,.13);
+  --c-kw:#c792ea; --c-str:#a5d6a7; --c-num:#f0a46c; --c-fn:#82aaff; --c-cm:#6b727c; --nest1:#1a1e27; --nest2:#1e2330; --nest3:#232a3b; color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:13.5px/1.65 var(--mono);-webkit-font-smoothing:antialiased;padding-block:20px 40px;padding-inline:28px}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+:focus-visible{outline:1px solid var(--accent);outline-offset:3px}
+.top{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:20px;padding-bottom:14px;border-bottom:1px solid var(--rule)}
+.brand{font-weight:600}
+.dim{color:var(--fg-3)}
+.top .r{margin-left:auto;color:var(--fg-2)}
+.main{display:grid;grid-template-columns:230px minmax(0,1fr) 340px;column-gap:32px;padding-top:22px;align-items:start}
+.side{position:sticky;top:20px;max-height:calc(100vh - 40px);overflow:auto;padding-right:18px;border-right:1px solid var(--rule)}
+.side input{width:100%;font:inherit;font-size:12px;color:var(--fg);background:var(--box);border:1px solid var(--box-line);border-radius:3px;padding:4px 8px;letter-spacing:0}
+.side input::placeholder{color:var(--fg-3)}
+.side h4{margin:16px 0 4px;font-size:11.5px;font-weight:500;color:var(--fg-3);overflow-wrap:anywhere}
+.side .none{color:var(--fg-3);font-size:12px;margin-top:12px}
+.panel{position:sticky;top:20px;padding-left:28px;border-left:1px solid var(--rule);max-height:calc(100vh - 40px);overflow:auto}
+.hs{color:var(--fg-3);font-weight:400;margin-right:10px}
+h1{margin:0;font-size:16px;font-weight:600}
+h2{margin:30px 0 8px;font-size:13.5px;font-weight:600}
+.meta{margin-top:6px;color:var(--fg-2);font-size:12.5px}
+.meta div{display:grid;grid-template-columns:84px minmax(0,1fr)}
+.meta .k{color:var(--fg-3)}
+.legend{margin-top:12px;display:flex;flex-wrap:wrap;gap:6px 22px;font-size:11.5px;color:var(--fg-3);align-items:center}
+.legend svg{vertical-align:middle;margin-right:6px}
+.dia{overflow-x:auto;margin-top:6px;padding-bottom:6px}
+svg.seq{display:block}
+svg text{font-family:var(--mono)}
+.grp line{stroke:var(--fg-3)}
+.grp text{font-size:11.5px;fill:var(--fg-3)}
+.pt{cursor:pointer}
+.pt .bx{fill:var(--box);stroke:var(--box-line)}
+.pt .lb{font-size:13px;font-weight:600;fill:var(--fg)}
+.pt .sb{font-size:11px;fill:var(--fg-3)}
+.pt:hover .bx,.pt.sel .bx{stroke:var(--accent)}
+.pt:hover .lb,.pt.sel .lb{fill:var(--accent)}
+.life{stroke:var(--rule);stroke-dasharray:2 4}
+.num{font-size:11px;fill:var(--fg-3)}
+.num.sub{fill:var(--accent)}
+.nb{stroke:none}
+.nbar{stroke:var(--accent);stroke-width:2;opacity:.45;stroke-linecap:butt}
+.nbar.sel{opacity:1;stroke-width:3}
+.ncap{stroke:var(--accent);stroke-width:1;opacity:.45}
+.it{cursor:pointer}
+.it .hit{fill:none;stroke:transparent;stroke-width:18}
+.it .fold{fill:var(--accent);font-weight:600}
+.it .tag{fill:var(--fg-3)}
+.it.exit text{font-size:11.5px;fill:var(--fg-2)}
+.it.exit .cond{fill:var(--fg-3)}
+.it.exit .ln{stroke:var(--fg-3);stroke-dasharray:3 3}
+.it .ln{fill:none;stroke:var(--fg-2);stroke-width:1.3}
+.it.ret .ln{stroke:var(--fg-3);stroke-width:1}
+.it.inf .ln{stroke-dasharray:5 4}
+.it .ah{fill:var(--fg-2)}
+.it text{font-size:12.5px;fill:var(--fg);paint-order:stroke;stroke:var(--halo,var(--bg));stroke-width:6px;stroke-linejoin:round}
+.it.ret text{fill:var(--fg-2)}
+.it .kd{fill:var(--fg-3)}
+.it .rk{fill:var(--warn)}
+.it.local text,.it.pure text{fill:var(--fg-2)}
+.it:hover .ln,.it.sel .ln{stroke:var(--accent)}
+.it:hover .ah,.it.sel .ah{fill:var(--accent)}
+.it:hover text,.it.sel text{fill:var(--accent)}
+.fr .bx{fill:var(--frame);stroke:var(--rule)}
+.fr .sep{stroke:var(--rule);stroke-dasharray:4 3}
+.fr text{font-size:11.5px;fill:var(--fg-2)}
+.fr .kw{fill:var(--fg);font-weight:600}
+.fr .nt{fill:var(--fg-3)}
+.fr{cursor:pointer}
+.fr:hover .bx,.fr.sel .bx{stroke:var(--accent)}
+.fr:hover .lbl,.fr.sel .lbl{fill:var(--accent)}
+.dv{cursor:pointer}
+.dv line{stroke:var(--rule)}
+.dv text{font-size:11.5px;fill:var(--fg-3)}
+.dv:hover text,.dv.sel text{fill:var(--accent)}
+.stories{display:flex;flex-direction:column;gap:1px}
+.stories button{color:var(--fg-2);display:grid;grid-template-columns:12px minmax(0,1fr);padding:3px 0;width:100%;line-height:1.4;font-size:12.5px}
+.stories button .mk{color:var(--accent)}
+.stories button .t{overflow-wrap:anywhere}
+.stories button.on{color:var(--fg);font-weight:600}
+.stories button:hover .t{text-decoration:underline;text-underline-offset:3px}
+.stories .fx{display:block;font-size:11px;color:var(--fg-3);font-weight:400}
+.stories .fx.w{color:var(--warn)}
+.it .cond{fill:var(--fg-3)}
+.it .en{font-style:normal}
+.tb{margin-left:auto;display:flex;flex-wrap:wrap;gap:4px 16px}
+.tb button{color:var(--accent)}
+.tb button:hover{text-decoration:underline;text-underline-offset:3px}
+.inside{margin:6px 0 0;padding:0;list-style:none;font-size:12.5px;color:var(--fg-2)}
+.inside li{padding:1px 0;overflow-wrap:anywhere}
+.pbtn{color:var(--accent);margin-top:10px;font-size:12.5px}
+.pbtn:hover{text-decoration:underline;text-underline-offset:3px}
+.list{margin:0;padding:0;list-style:none}
+.list li{padding:3px 0;display:grid;grid-template-columns:18px minmax(0,1fr);color:var(--fg-2)}
+.list li::before{content:"-";color:var(--fg-3)}
+.list.warn li::before{content:"!";color:var(--warn)}
+.list button{display:inline;color:var(--accent)}
+.list button:hover{text-decoration:underline;text-underline-offset:3px}
+.cov{display:flex;flex-wrap:wrap;gap:4px 28px;color:var(--fg-2)}
+.cov .ok{color:var(--ok)}
+details summary{cursor:pointer;color:var(--accent)}
+pre.json{font-size:11.5px;line-height:1.55;overflow:auto;max-height:520px;color:var(--fg-2);margin:10px 0 0}
+.pp h3{margin:0;font-size:14px;font-weight:600;color:var(--accent);overflow-wrap:anywhere}
+.kv{display:grid;grid-template-columns:84px minmax(0,1fr);column-gap:12px;margin-top:12px;font-size:12.5px}
+.kv > div{padding:2px 0;overflow-wrap:anywhere}
+.kv .k{color:var(--fg-3)}
+.kv .exact{color:var(--ok)}
+.kv .inferred{color:var(--warn)}
+.cfile{margin:16px 0 4px;color:var(--fg-3);font-size:12px}
+.code{font-size:12px;line-height:1.7;overflow-x:auto}
+.code-in{display:inline-block;min-width:100%}
+.cl{display:flex;white-space:pre;padding-right:8px}
+.ct{white-space:pre} /* own flex item: flex containers drop whitespace-only text between spans */
+.cn{flex:none;width:30px;padding-right:12px;text-align:right;color:var(--fg-3);user-select:none}
+.cl.hl{background:var(--hl)}
+.cl.hl .cn{color:var(--accent)}
+.c-kw{color:var(--c-kw)} .c-str{color:var(--c-str)} .c-num{color:var(--c-num)} .c-fn{color:var(--c-fn)} .c-cm{color:var(--c-cm);font-style:italic}
+.hint{color:var(--fg-3);font-size:12px;margin-top:14px}
+@media (max-width: 980px){
+  body{padding-inline:16px}
+  .main{grid-template-columns:minmax(0,1fr)}
+  .side{position:static;max-height:none;border-right:0;padding-right:0;border-bottom:1px solid var(--rule);padding-bottom:14px;margin-bottom:18px}
+  .panel{position:static;max-height:none;overflow:visible;border-left:0;padding-left:0;border-top:1px solid var(--rule);padding-top:18px;margin-top:24px}
+  .top .r{margin-left:0}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="top">
+  <span class="brand">plainfold</span><span class="dim" id="proj"></span>
+  <span class="r">skeleton only · no LLM · every label is code text</span>
+</div>
+<div class="main">
+  <aside class="side" aria-label="Flows">
+    <input id="q" type="search" placeholder="filter flows" aria-label="Filter flows" autocomplete="off">
+    <nav class="stories" id="stories" aria-label="Flows"></nav>
+  </aside>
+  <section aria-label="Story">
+    <h1><span class="hs">#</span><span id="title"></span></h1>
+    <div class="meta" id="meta"></div>
+    <div class="legend" id="legend"></div>
+    <div class="dia" id="dia"></div>
+    <h2><span class="hs">##</span>what the code shows</h2>
+    <ul class="list warn" id="signals"></ul>
+    <h2><span class="hs">##</span>not resolved yet</h2>
+    <ul class="list" id="gaps"></ul>
+    <h2><span class="hs">##</span>every line behind a step</h2>
+    <div class="cov" id="cov"></div>
+    <h2><span class="hs">##</span>the model</h2>
+    <details><summary>show this story's model as JSON</summary><pre class="json" id="json"></pre></details>
+  </section>
+  <aside class="panel" id="panel" aria-label="Details"></aside>
+</div>
+
+<script type="application/json" id="model">/*MODEL*/</script>
+<script type="application/json" id="labels">/*LABELS*/</script>
+<script>
+(() => {
+'use strict';
+const M = JSON.parse(document.getElementById('model').textContent);
+const FILES = M.files;
+document.getElementById('proj').textContent = M.name;
+const L = JSON.parse(document.getElementById('labels').textContent);
+const hasEn = Object.keys(L).length > 0;
+let en = hasEn;
+const lab = (it) => (en && L[`${it.t}|${it.ref.file}:${it.ref.from}`]) || null;
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const tw = (s, size = 12.5) => String(s).length * size * 0.6; // Geist Mono advance is 0.6em
+const TOP = 98;
+
+// ---------- per-story state ----------
+let S, P, PI, BY, allCalls, findings;
+const open = new Set(), exitsOpen = new Set();
+let every = false, ops = [], sel = null, zoom = null, zNow = 1; // zoom null = fit the width
+const pname = (id) => PI[id]?.name ?? id;
+const walk = (items, f) => { for (const it of items) { f(it); if (it.t === 'frame') { walk(it.items, f); walk(it.else || [], f); } if (it.t === 'call' && it.body) walk(it.body, f); } };
+const effectsOf = (s) => { const e = new Set(); walk(s.items, (i) => { if (i.t === 'call' && i.effect) e.add(i.effect); }); return e; };
+
+function load(story) {
+  S = story; P = S.participants; PI = Object.fromEntries(P.map((p) => [p.id, p]));
+  BY = {}; walk(S.items, (i) => { BY[i.id] = i; });
+  allCalls = Object.values(BY).filter((i) => i.t === 'call' && i.body);
+  allCalls.forEach((c) => { if (c.from === c.to) c.lane = true; });
+  open.clear(); exitsOpen.clear();
+  // the screen's own calls start open, everything deeper starts closed
+  (function d(items) { for (const it of items) { if (it.t === 'call' && it.body && it.from !== it.to) open.add(it.id); if (it.t === 'frame') { d(it.items); d(it.else || []); } } })(S.items);
+  sel = (Object.values(BY).find((i) => i.t === 'call') || S.items[0]).id;
+  try { history.replaceState(null, '', '#' + M.stories.indexOf(S)); } catch (e) {}
+
+  side();
+  $('title').textContent = flowName(S).main + (flowName(S).sub ? ' · ' + flowName(S).sub : '');
+  const count = (t) => Object.values(BY).filter((i) => i.t === t).length;
+  const fxp = {};
+  walk(S.items, (i) => { if (i.t === 'call' && i.effect) (fxp[i.to] = fxp[i.to] || new Set()).add(i.effect); });
+  const touches = P.filter((p) => p.group === 'supabase' || p.group === 'outside').map((p) => p.name + (p.sub ? ` (${p.sub}${fxp[p.id] ? ' · ' + [...fxp[p.id]].join(', ') : ''})` : ''));
+  const tr = S.trigger;
+  $('meta').innerHTML = [
+    ['trigger', tr.kind === 'screen-open' ? `screen opens · ${tr.route} · ${tr.ref.file}` : `user action · ${tr.route} · ${tr.ref.file}:${tr.ref.from}`],
+    ['touches', touches.join(' · ') || 'nothing outside the app'],
+    ['built', `${P.length} participants · ${count('call')} calls · ${count('return')} returns · ${M.stats.llmCalls} LLM calls · ${M.stories.length} stories in ${M.stats.ms} ms`],
+  ].map(([k, v]) => `<div><span class="k">${k}</span><span>${esc(v)}</span></div>`).join('');
+
+  findings = [];
+  const fItem = (f, kind) => { findings.push({ ...f, kind }); return findings.length - 1; };
+  const at = (r) => `${r.file}:${r.from}${r.to !== r.from ? '-' + r.to : ''}`;
+  $('signals').innerHTML = S.signals.map((f) => `<li><span>${esc(f.text)} · <button type="button" data-f="${fItem(f, 'signal')}">${esc(at(f.ref))}</button></span></li>`).join('') || '<li>nothing</li>';
+  $('gaps').innerHTML = S.gaps.map((f) => `<li><span>${esc(f.text)}${FILES[f.ref.file] ? ` · <button type="button" data-f="${fItem(f, 'gap')}">${esc(at(f.ref))}</button>` : ''}</span></li>`).join('') || '<li>nothing</li>';
+  $('cov').innerHTML = S.coverage.map((c) => `<span>${esc(c.fn)} <span class="${c.missing.length ? '' : 'ok'}">${c.covered}/${c.total}</span>${c.missing.length ? ` <span class="dim">missing ${c.missing.join(', ')}</span>` : ''}</span>`).join('');
+  $('json').textContent = JSON.stringify(S, null, 2);
+  render();
+}
+
+// ---------- readable flow names ----------
+// What a person would call the flow: the words on the control, else the handler's name in plain words, else the event.
+const words = (name) => name.replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/[_-]+/g, ' ').trim().split(/\s+/).filter((w, i) => !(i === 0 && /^(handle|handler|on)$/i.test(w))).join(' ').toLowerCase();
+const cap = (t) => t.charAt(0).toUpperCase() + t.slice(1);
+function flowName(st) {
+  const t = st.trigger;
+  if (t.kind !== 'user-action' || (!t.text && !t.handler && !t.event)) return { main: st.title, sub: '' };
+  const main = t.text ? `“${t.text}”` : t.handler && words(t.handler) ? cap(words(t.handler)) : cap(t.event ? words(t.event) : 'action');
+  return { main, sub: [t.event && words(t.event), t.control && `on ${t.control}`].filter(Boolean).join(' ') };
+}
+
+// ---------- flow list: grouped by the screen they belong to ----------
+function side() {
+  const q = $('q').value.trim().toLowerCase();
+  const groups = new Map();
+  M.stories.forEach((st, i) => {
+    if (q && !(st.title + ' ' + flowName(st).main + ' ' + st.trigger.route).toLowerCase().includes(q)) return;
+    if (!groups.has(st.trigger.route)) groups.set(st.trigger.route, []);
+    groups.get(st.trigger.route).push([st, i]);
+  });
+  $('stories').innerHTML = [...groups].map(([route, list]) => `<h4>${esc(route)}</h4>` + list.map(([st, i]) => {
+    const fx = [...effectsOf(st)], nm = flowName(st);
+    return `<button type="button" class="${st === S ? 'on' : ''}" data-act="story" data-id="${i}"><span class="mk">${st === S ? '›' : ''}</span><span><span class="t">${esc(nm.main)}</span>` +
+      (nm.sub ? `<span class="fx">${esc(nm.sub)}</span>` : '') +
+      (fx.length ? `<span class="fx${fx.some((f) => f !== 'reads') ? ' w' : ''}">${esc(fx.join(', '))}</span>` : '') + `</span></button>`;
+  }).join('')).join('') || '<div class="none">no flow matches</div>';
+  const on = $('stories').querySelector('.on');
+  const box = document.querySelector('.side'); // scroll only the list, not the page
+  if (on) box.scrollTop = Math.max(0, on.offsetTop - box.clientHeight / 2);
+}
+
+// ---------- what is visible ----------
+const isExit = (f) => f.t === 'frame' && f.kind === 'alt' && !f.else && f.items.some((i) => i.t === 'return') && f.items.every((i) => i.t === 'return' || (i.t === 'self' && i.kind === 'local'));
+const code3 = (l) => (/^(\d{3}|redirect)\b/.exec(l) || [l])[0];
+const orTag = (exits) => { const u = [...new Set(exits.map((e) => code3(e.label)))]; return u.length ? 'or ' + u.join(', ') : ''; };
+// The callee's own returns: the main one (outside any branch) and the early exits.
+function returnsOf(body, callee) {
+  let main = null; const exits = [];
+  (function w(items, inExit) {
+    for (const i of items) {
+      if (i.t === 'return' && i.from === callee) { if (inExit) exits.push(i); else main = i; }
+      else if (i.t === 'frame') { const ex = inExit || isExit(i); w(i.items, ex); w(i.else || [], ex); }
+    }
+  })(body, false);
+  return { main, exits };
+}
+const shortArgs = (l) => l.replace(/\((.{11,})\)$/, '(…)');
+
+// A call to a plain function in the same process that touches nothing outside (no body, no effect), together with its return,
+// folds into one row on the caller: "name(args) → result". Only when everything between the two belongs to the callee.
+const ownedBy = (i, id) => (i.t === 'self' ? i.at === id : i.t === 'return' ? i.from === id : i.t === 'call' ? i.from === id : i.t === 'frame' ? i.items.every((x) => ownedBy(x, id)) && (i.else || []).every((x) => ownedBy(x, id)) : false);
+function plainCall(items, idx) {
+  const c = items[idx];
+  if (every || c.t !== 'call' || c.body || c.effect || c.table || c.from === c.to) return null;
+  const to = PI[c.to], from = PI[c.from];
+  if (!to || !from || to.kind !== 'function' || to.group !== from.group) return null;
+  for (let j = idx + 1; j < items.length; j++) {
+    const x = items[j];
+    if (x.t === 'return' && x.from === c.to && x.to === c.from) return { ret: x, next: j };
+    if (!ownedBy(x, c.to)) return null;
+  }
+  return null;
+}
+
+function vis(items, scope, depth = 0, par = null) {
+  const out = [];
+  for (let idx = 0; idx < items.length; idx++) {
+    const it = items[idx];
+    const pc = plainCall(items, idx);
+    if (pc) {
+      out.push({ type: 'self', it: { t: 'self', id: it.id, at: it.from, kind: 'pure', label: it.label, ref: it.ref }, merged: [it], text: `${it.label} → ${pc.ret.label}` });
+      idx = pc.next;
+      continue;
+    }
+    if (it.t === 'self') {
+      if (!every && (it.kind === 'local' || (it.kind === 'state' && (it.label.startsWith('useState:') || (scope && scope.lane))))) continue;
+      const prev = out[out.length - 1];
+      if (!every && it.kind === 'state' && prev && prev.type === 'self' && prev.it.kind === 'state' && !prev.cond) { prev.merged.push(it); continue; }
+      out.push({ type: 'self', it, merged: [it] });
+    } else if (it.t === 'call') {
+      out.push({ type: 'msg', it, fold: it.body ? (open.has(it.id) ? '▾' : '▸') : '' });
+      if (!it.body) continue;
+      const r = returnsOf(it.body, it.to);
+      const lane = it.from === it.to;
+      if (open.has(it.id)) out.push(...vis(it.body, { callId: it.id, lane: lane || (scope && scope.lane), ...r }, depth + 1, it.id));
+      else if (lane) {
+        // closed: one arrow from the screen to what the hook goes on to touch ("reads splits, expenses")
+        const targets = new Set();
+        walk(it.body, (i) => { if (i.t === 'call' && i.table) targets.add(i.to); });
+        if (targets.size === 1) {
+          const by = {};
+          for (const t of it.touches || []) { const [e, ...n] = t.split(' '); (by[e] = by[e] || []).push(n.join(' ')); }
+          const sum = Object.entries(by).map(([e, n]) => `${e} ${n.join(', ')}`).join(' · ');
+          out[out.length - 1] = { type: 'msg', it: { ...it, to: [...targets][0], label: it.label.replace(/\(.*$/, '') }, sum, fold: '▸' };
+        } else out[out.length - 1].tag = (it.touches || []).join(', ');
+      }
+      else if (r.main || r.exits.length) {
+        const main = r.main || r.exits[r.exits.length - 1];
+        out.push({ type: 'msg', it: main, synth: it, tag: orTag(r.main ? r.exits : r.exits.slice(0, -1)) });
+      }
+    } else if (it.t === 'return') {
+      const main = scope && it === scope.main && scope.exits.length;
+      out.push({ type: 'msg', it, exitsOf: main ? scope.callId : null, tag: main && !exitsOpen.has(scope.callId) ? orTag(scope.exits) : '', fold: main ? (exitsOpen.has(scope.callId) ? '▾' : '▸') : '' });
+    } else if (scope && isExit(it)) {
+      if (exitsOpen.has(scope.callId)) for (const r of it.items) if (r.t === 'return') out.push({ type: 'msg', it: r, cond: it.label, exit: true });
+    } else if (it.kind === 'effect') {
+      out.push({ type: 'divider', it }, ...vis(it.items, scope, depth, par));
+    } else {
+      const kids = vis(it.items, scope, depth, par), els = it.else ? vis(it.else, scope, depth, par) : [];
+      // a branch with a single visible step is one row with its condition in front, not a box
+      if (it.kind === 'alt' && !els.length && kids.length === 1 && kids[0].type !== 'frame' && kids[0].type !== 'divider' && !kids[0].cond) out.push({ ...kids[0], cond: it.label, frame: it });
+      else if (kids.length || els.length) out.push({ type: 'frame', it, kids, els });
+    }
+  }
+  // every row knows which open call it sits under (par) and how deep (depth); rows spliced in from a deeper call are already tagged
+  for (const n of out) if (n.depth === undefined) { n.depth = depth; n.par = par; }
+  return out;
+}
+const hal = (o) => (o.depth ? ` style="--halo:var(--nest${Math.min(o.depth, 3)})"` : ''); // label halo matches the band behind it
+const condText = (n) => (n.cond ? `[${n.cond}] ` : '');
+const isSelfCall = (n) => n.type === 'msg' && n.it.t === 'call' && n.it.from === n.it.to;
+const selfLabel = (n) => condText(n) + (n.text ? n.text : n.merged.length > 1 ? n.merged.map((i) => shortArgs(i.label)).join(' · ') : (n.it.kind === 'render' && !lab(n.it) ? 'render ' : '') + (lab(n.it) || n.it.label));
+function msgSegs(n) {
+  const segs = [];
+  if (n.cond) segs.push([condText(n), 'cond']);
+  segs.push([lab(n.it) || n.it.label, lab(n.it) ? 'en' : '']);
+  if (n.sum) segs.push([` · ${n.sum}`, 'tag']);
+  if (n.it.effect && n.it.effect !== 'reads') segs.push([`  ${n.it.effect}`, 'rk']);
+  if (n.tag) segs.push([` · ${n.tag}`, 'tag']);
+  if (n.it.t === 'call' && n.it.touches && n.fold === '▾' && n.it.from === n.it.to) segs.push([` · ${n.it.touches.join(', ')}`, 'tag']);
+  if (n.synth) segs.push([' ▸', 'fold']);
+  else if (n.fold) segs.push([` ${n.fold}`, 'fold']);
+  return segs;
+}
+const msgText = (n) => msgSegs(n).map((s) => s[0]).join('');
+
+// ---------- draw ----------
+function draw() {
+  const nodes = vis(S.items, null);
+  const rows = [];
+  let depthMax = 0;
+  (function flat(ns, d) { for (const n of ns) { depthMax = Math.max(depthMax, d); if (n.type === 'frame') { flat(n.kids, d + 1); flat(n.els, d + 1); } else rows.push(n); } })(nodes, 0);
+  const used = new Set();
+  for (const r of rows) { if (r.type === 'msg') { used.add(r.it.from); used.add(r.it.to); } if (r.type === 'self') used.add(r.it.at); }
+  if (!used.size) used.add(P[0].id);
+  const vp = P.filter((p) => used.has(p.id));
+  const subOf = (p) => (p.sub && p.sub.length > 26 ? p.sub.slice(0, 25) + '…' : p.sub || p.kind);
+  const bw = (p) => Math.min(190, Math.max(tw(p.name, 13), tw(subOf(p), 11)) + 24);
+
+  // columns: as tight as the boxes allow, then widened until every arrow label fits between its ends
+  const X = {}, ix = {};
+  let x = Math.max(58 + bw(vp[0]) / 2, 58 + 14 * (depthMax + 1));
+  vp.forEach((p, i) => { if (i) x += Math.max(110, (bw(vp[i - 1]) + bw(p)) / 2 + 20); X[p.id] = x; ix[p.id] = i; });
+  const cons = rows.filter((r) => r.type === 'msg' && !isSelfCall(r)).map((r) => [Math.min(ix[r.it.from], ix[r.it.to]), Math.max(ix[r.it.from], ix[r.it.to]), tw(msgText(r), r.exit ? 11.5 : 12.5) + 30]).sort((a, b) => a[1] - a[0] - (b[1] - b[0]));
+  for (const [a, b, need] of cons) { const have = X[vp[b].id] - X[vp[a].id]; if (have < need) for (let k = b; k < vp.length; k++) X[vp[k].id] += need - have; }
+
+  const ext = (n) => {
+    if (n.type === 'self') { const x0 = X[n.it.at]; return [x0 - 4, x0 + 34 + tw(selfLabel(n))]; }
+    if (isSelfCall(n)) { const x0 = X[n.it.from]; return [x0 - 4, x0 + 34 + tw(msgText(n))]; }
+    if (n.type === 'msg') { const a = X[n.it.from], b = X[n.it.to], m = (a + b) / 2, w = tw(msgText(n)); return [Math.min(a, b, m - w / 2), Math.max(a, b, m + w / 2)]; }
+    if (n.type === 'divider') return [Infinity, -Infinity];
+    let l = Infinity, r = -Infinity;
+    for (const c of [...n.kids, ...n.els]) { const [a, b] = ext(c); l = Math.min(l, a); r = Math.max(r, b); }
+    l -= 12; r += 12;
+    return [l, Math.max(r, l + tw(`${n.it.kind} ${n.it.label}`, 11.5) + 20)];
+  };
+
+  ops = [];
+  let y = TOP;
+  const cnt = {}, nlOf = {}, parentOf = {}, callY = {};
+  (function place(ns) {
+    for (const n of ns) {
+      if (n.type === 'frame') {
+        const [l, r] = ext(n);
+        const op = { ...n, l, r, y0: y };
+        ops.push(op);
+        y += 24; place(n.kids);
+        if (n.els.length) { op.elseY = y; y += 22; place(n.els); }
+        op.y1 = y + 2; y += 10;
+      } else if (n.type === 'divider') { ops.push({ ...n, y }); y += 30; }
+      else {
+        const k = n.par || '';
+        cnt[k] = (cnt[k] || 0) + 1;
+        const nl = n.par && nlOf[n.par] ? `${nlOf[n.par]}.${cnt[k]}` : `${cnt[k]}`;
+        if (n.type === 'msg' && n.it.t === 'call') { nlOf[n.it.id] = nl; parentOf[n.it.id] = n.par; callY[n.it.id] = y; }
+        ops.push({ ...n, y, nl });
+        y += n.type === 'self' ? 30 : n.exit ? 26 : 34;
+      }
+    }
+  })(nodes);
+  const H = y + 8;
+  // vertical extent of everything under each open call, for the band and the bar beside it
+  const span = {};
+  for (const o of ops) {
+    if (!o.par) continue;
+    const a = o.type === 'frame' ? o.y0 : o.y, b = o.type === 'frame' ? o.y1 : o.y + (o.type === 'self' ? 28 : o.exit ? 24 : o.type === 'divider' ? 26 : 32);
+    for (let id = o.par; id; id = parentOf[id]) { const e = span[id] || (span[id] = { y0: a, y1: b }); e.y0 = Math.min(e.y0, a); e.y1 = Math.max(e.y1, b); }
+  }
+  let W = X[vp[vp.length - 1].id] + bw(vp[vp.length - 1]) / 2 + 12;
+  for (const o of ops) if (o.type !== 'divider') W = Math.max(W, (o.type === 'frame' ? o.r : ext(o)[1]) + 12);
+
+  let svg = '';
+  const callRow = {}; for (const o of ops) if (o.type === 'msg' && o.it.t === 'call') callRow[o.it.id] = o;
+  Object.entries(span).map(([id, e]) => ({ id, e, d: (callRow[id] ? callRow[id].depth : 0) + 1 })).sort((a, b) => a.d - b.d).forEach(({ id, e, d }) => {
+    const top = callY[id] + 24, bx = 3 + (d - 1) * 4, on = sel === id ? ' sel' : '';
+    svg += `<rect class="nb" x="0" y="${top}" width="${W}" height="${e.y1 - top}" fill="var(--nest${Math.min(d, 3)})"/>` +
+      `<line class="nbar${on}" x1="${bx}" y1="${top}" x2="${bx}" y2="${e.y1}"/><line class="ncap" x1="${bx}" y1="${e.y1}" x2="${bx + 8}" y2="${e.y1}"/>`;
+  });
+  for (let i = 0; i < vp.length;) {
+    let j = i; while (j + 1 < vp.length && vp[j + 1].group === vp[i].group) j++;
+    const l = X[vp[i].id] - bw(vp[i]) / 2, r = X[vp[j].id] + bw(vp[j]) / 2;
+    svg += `<g class="grp"><text x="${l}" y="12">${esc(vp[i].group)}</text><line x1="${l}" y1="20" x2="${r}" y2="20"/></g>`;
+    i = j + 1;
+  }
+  ops.forEach((o, k) => {
+    if (o.type !== 'frame') return;
+    svg += `<g class="fr${sel === o.it.id ? ' sel' : ''}" data-k="${k}" tabindex="0" role="button" aria-label="${esc(o.it.kind + ' ' + o.it.label)}">` +
+      `<rect class="bx" x="${o.l}" y="${o.y0}" width="${o.r - o.l}" height="${o.y1 - o.y0}" rx="3"/>` +
+      `<text x="${o.l + 8}" y="${o.y0 + 15}"><tspan class="kw">${esc(o.it.kind)}</tspan> <tspan class="lbl">${esc(o.it.label)}</tspan></text>` +
+      (o.elseY ? `<line class="sep" x1="${o.l}" y1="${o.elseY + 4}" x2="${o.r}" y2="${o.elseY + 4}"/><text x="${o.l + 8}" y="${o.elseY + 17}">[else]</text>` : '') + `</g>`;
+  });
+  for (const p of vp) {
+    const x0 = X[p.id], w = bw(p);
+    svg += `<line class="life" x1="${x0}" y1="76" x2="${x0}" y2="${H}"/>` +
+      `<g class="pt${sel === 'p:' + p.id ? ' sel' : ''}" data-p="${esc(p.id)}" tabindex="0" role="button" aria-label="${esc(p.name)}"><rect class="bx" x="${x0 - w / 2}" y="30" width="${w}" height="46" rx="3"/>` +
+      `<text class="lb" x="${x0}" y="50" text-anchor="middle">${esc(p.name)}</text><text class="sb" x="${x0}" y="66" text-anchor="middle">${esc(subOf(p))}</text></g>`;
+  }
+  ops.forEach((o, k) => {
+    const it = o.it, on = sel === it.id || (o.synth && sel === o.synth.id) ? ' sel' : '';
+    if (o.type === 'divider') {
+      svg += `<g class="dv${on}" data-k="${k}" tabindex="0" role="button" aria-label="${esc(it.note)}"><text x="10" y="${o.y + 12}">${lab(it) ? esc(lab(it)) : esc(it.note) + ' · ' + esc(it.label)}</text><line x1="10" y1="${o.y + 19}" x2="${W - 10}" y2="${o.y + 19}"/></g>`;
+    } else if (o.type === 'self') {
+      const x0 = X[it.at], ty = o.y + 18;
+      const kw = (it.kind === 'render' || it.kind === 'trigger') && o.merged.length === 1;
+      const head = it.kind === 'render' ? 'render ' : it.label.split(' ')[0] + ' ';
+      const body = lab(it) ? esc(lab(it)) : kw ? `<tspan class="kd">${esc(head)}</tspan>${esc(it.kind === 'render' ? it.label : it.label.slice(head.length))}` : esc(selfLabel(o).slice(condText(o).length));
+      svg += `<text class="num${o.par ? ' sub' : ''}" x="52" y="${ty}" text-anchor="end">${o.nl}</text><g class="it ${it.kind}${on}"${hal(o)} data-k="${k}" tabindex="0" role="button" aria-label="${esc(selfLabel(o))}">` +
+        `<path class="hit" d="M${x0} ${o.y + 6} H${x0 + 26} V${o.y + 20} H${x0}"/>` +
+        `<path class="ln" d="M${x0} ${o.y + 6} H${x0 + 24} V${o.y + 20} H${x0 + 7}"/><path class="ah" d="M${x0 + 1} ${o.y + 20} L${x0 + 8} ${o.y + 16.5} L${x0 + 8} ${o.y + 23.5} Z"/>` +
+        `<text x="${x0 + 32}" y="${ty}">${o.cond ? `<tspan class="cond">${esc(condText(o))}</tspan>` : ''}${body}</text></g>`;
+    } else if (isSelfCall(o)) {
+      const x0 = X[it.from], ty = o.y + 18;
+      const label = msgSegs(o).map(([t, c]) => (c ? `<tspan class="${c}">${esc(t)}</tspan>` : esc(t))).join('');
+      svg += `<text class="num${o.par ? ' sub' : ''}" x="52" y="${ty}" text-anchor="end">${o.nl}</text><g class="it${on}"${hal(o)} data-k="${k}" tabindex="0" role="button" aria-label="${esc(msgText(o))}">` +
+        `<path class="hit" d="M${x0} ${o.y + 6} H${x0 + 26} V${o.y + 20} H${x0}"/>` +
+        `<path class="ln" d="M${x0} ${o.y + 6} H${x0 + 24} V${o.y + 20} H${x0 + 7}"/><path class="ah" d="M${x0 + 1} ${o.y + 20} L${x0 + 8} ${o.y + 16.5} L${x0 + 8} ${o.y + 23.5} Z"/>` +
+        `<text x="${x0 + 32}" y="${ty}">${label}</text></g>`;
+    } else if (o.type === 'msg') {
+      const a = X[it.from], b = X[it.to], ly = o.y + (o.exit ? 18 : 22), dir = b > a ? 1 : -1, ret = it.t === 'return', end = b - dir;
+      const head = ret ? `<path class="ln" d="M${end - dir * 7} ${ly - 4} L${end} ${ly} L${end - dir * 7} ${ly + 4}"/>` : `<path class="ah" d="M${end} ${ly} L${end - dir * 8} ${ly - 4} L${end - dir * 8} ${ly + 4} Z"/>`;
+      const label = msgSegs(o).map(([t, c]) => (c ? `<tspan class="${c}">${esc(t)}</tspan>` : esc(t))).join('');
+      svg += `<text class="num${o.par ? ' sub' : ''}" x="52" y="${o.y + (o.exit ? 11 : 14)}" text-anchor="end">${o.nl}</text>`;
+      svg += `<g class="it${ret ? ' ret' : ''}${o.exit ? ' exit' : ''}${it.link && it.link.kind === 'inferred' ? ' inf' : ''}${on}"${hal(o)} data-k="${k}" tabindex="0" role="button" aria-label="${esc(pname(it.from) + ' to ' + pname(it.to) + ': ' + msgText(o))}">` +
+        `<line class="hit" x1="${a}" y1="${ly - 6}" x2="${b}" y2="${ly - 6}"/><line class="ln" x1="${a}" y1="${ly}" x2="${end - dir * (ret ? 0 : 7)}" y2="${ly}"/>${head}` +
+        `<text x="${(a + b) / 2}" y="${o.y + (o.exit ? 11 : 14)}" text-anchor="middle">${label}</text></g>`;
+    }
+  });
+  zNow = zoom ?? Math.max(0.35, Math.min(1, ($('dia').clientWidth - 4) / W));
+  $('dia').innerHTML = `<svg class="seq" width="${Math.round(W * zNow)}" height="${Math.round(H * zNow)}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Sequence diagram: ${esc(S.title)}">${svg}</svg>`;
+}
+
+// ---------- toolbar ----------
+function toolbar() {
+  $('legend').innerHTML =
+    `<span><svg width="34" height="8"><line x1="0" y1="4" x2="26" y2="4" stroke="var(--fg-2)" stroke-width="1.3"/><path d="M26 0 L34 4 L26 8 Z" fill="var(--fg-2)"/></svg>call</span>` +
+    `<span><svg width="34" height="8"><line x1="0" y1="4" x2="33" y2="4" stroke="var(--fg-3)"/><path d="M27 0 L33 4 L27 8" fill="none" stroke="var(--fg-3)"/></svg>return</span>` +
+    `<span><span style="color:var(--accent)">▸</span> click to open</span>` +
+    `<span>↩ loop-back row = a plain helper on the same side · result after →</span>` +
+    `<span><span style="color:var(--accent)">▎</span> shaded block = what happens inside the arrow above · 9.1, 9.2 = its steps</span>` +
+    `<span class="tb"><button type="button" data-act="zout" aria-label="zoom out">−</button><span class="dim">${Math.round(zNow * 100)}%</span><button type="button" data-act="zin" aria-label="zoom in">+</button><button type="button" data-act="zfit" aria-pressed="${zoom === null}">fit width</button><button type="button" data-act="all">open all</button><button type="button" data-act="none">close all</button>` +
+    `<button type="button" data-act="every" aria-pressed="${every}">every step: ${every ? 'on' : 'off'}</button>` +
+    (hasEn ? `<button type="button" data-act="en">english: ${en ? 'on' : 'off'}</button>` : '') + `</span>` +
+    (hasEn && en ? `<span class="dim" style="flex-basis:100%">English wording is written by hand in chat for now, standing in for the LLM. It is not verified against the code.</span>` : '');
+}
+
+// ---------- code ----------
+const KW = /^(?:const|let|var|return|if|else|await|async|function|export|default|import|from|type|new|null|true|false|for|of|while|throw|try|catch|finally|typeof|in)$/;
+function hl(line) {
+  const re = /(\/\/.*$)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`)|(\b\d+(?:\.\d+)?\b)|([A-Za-z_$][\w$]*)(?=\s*\()|([A-Za-z_$][\w$]*)/g;
+  let out = '', last = 0, m;
+  while ((m = re.exec(line))) {
+    out += esc(line.slice(last, m.index));
+    const [t] = m;
+    if (m[1]) out += `<span class="c-cm">${esc(t)}</span>`;
+    else if (m[2]) out += `<span class="c-str">${esc(t)}</span>`;
+    else if (m[3]) out += `<span class="c-num">${esc(t)}</span>`;
+    else if (KW.test(t)) out += `<span class="c-kw">${t}</span>`;
+    else out += m[4] ? `<span class="c-fn">${esc(t)}</span>` : esc(t);
+    last = m.index + t.length;
+  }
+  return out + esc(line.slice(last));
+}
+function code(ref, ctxLines = 3, max = 40, title) {
+  const src = FILES[ref.file];
+  if (src == null) return '';
+  const lines = src.split('\n');
+  const a = Math.max(1, ref.from - ctxLines), b = Math.min(lines.length, ref.to + ctxLines, a + max);
+  let h = '';
+  for (let l = a; l <= b; l++) h += `<div class="cl${l >= ref.from && l <= ref.to ? ' hl' : ''}"><span class="cn">${l}</span><span class="ct">${hl(lines[l - 1])}</span></div>`;
+  const total = Math.min(lines.length, ref.to + ctxLines);
+  if (total > b) h += `<div class="cl"><span class="cn"></span><span class="ct c-cm">… ${total - b} more lines</span></div>`;
+  return `<div class="cfile">${esc(title || ref.file + ' · ' + (ref.from === ref.to ? 'line ' + ref.from : 'lines ' + ref.from + '-' + ref.to))}</div><div class="code"><div class="code-in">${h}</div></div>`;
+}
+
+// ---------- details panel ----------
+const SELF = { local: 'local work: crosses no boundary, hidden unless "every step" is on', state: 'React state; changing it renders the screen again', render: 'what the screen shows', reads: 'reads the incoming request', trigger: 'what starts this story: someone uses the screen' };
+const FRAME = { alt: 'branch: runs only when the condition holds', loop: 'repeats for each element', effect: 'React runs this right after the screen has appeared' };
+function inside(body, callee) {
+  const out = [];
+  (function w(items, cond) {
+    for (const i of items) {
+      if (i.t === 'call') out.push(`→ ${pname(i.to)}: ${i.label}${i.effect && i.effect !== 'reads' ? ' (' + i.effect + ')' : ''}`);
+      else if (i.t === 'self' && i.kind === 'reads') out.push(`reads ${i.label}`);
+      else if (i.t === 'return' && i.from === callee) out.push(`${cond ? `if ${cond}: ` : ''}returns ${i.label}`);
+      else if (i.t === 'frame') { w(i.items, i.kind === 'alt' ? i.label : cond); if (i.else) w(i.else, 'else'); }
+    }
+  })(body, null);
+  return out;
+}
+function panel() {
+  if (!sel) return;
+  let h = '';
+  if (sel.startsWith('p:')) {
+    const p = PI[sel.slice(2)];
+    h += `<h3>${esc(p.name)}</h3><div class="kv"><div class="k">kind</div><div>${esc(p.kind)}</div><div class="k">runs in</div><div>${esc(p.group)}</div>${p.sub ? `<div class="k">from</div><div>${esc(p.sub)}</div>` : ''}</div>`;
+    h += p.ref ? code(p.ref, 0, 60) : `<p class="hint">Not in this project's code. plainfold knows it through the Supabase client calls that reach it.</p>`;
+  } else if (sel.startsWith('f:')) {
+    const f = findings[+sel.slice(2)];
+    h += `<h3>${f.kind === 'signal' ? 'what the code shows' : 'not resolved yet'}</h3><p style="color:var(--fg-2)">${esc(f.text)}</p>` + code(f.ref, 3);
+  } else {
+    const it = BY[sel];
+    const kv = [['kind', it.t === 'self' ? `step · ${SELF[it.kind]}` : it.t === 'frame' ? `${it.kind} · ${FRAME[it.kind]}` : it.t]];
+    if (it.from) kv.push(['from → to', `${pname(it.from)} → ${pname(it.to)}`]);
+    if (it.at) kv.push(['on', pname(it.at)]);
+    if (it.link) kv.push(['resolved', `<span class="${it.link.kind}">${it.link.kind}</span> · ${esc(it.link.how)}`, true]);
+    if (it.effect) kv.push(['effect', it.effect]);
+    if (it.note) kv.push(['note', it.note]);
+    if (it.detail && it.detail !== it.label) kv.push(['code', it.detail]);
+    h += `<h3>${esc(it.t === 'frame' ? `${it.kind} ${it.label}` : (it.kind === 'render' ? 'render ' : '') + it.label)}</h3>`;
+    h += `<div class="kv">${kv.map(([k, v, raw]) => `<div class="k">${k}</div><div>${raw ? v : esc(v).replace(/\n/g, '<br>')}</div>`).join('')}</div>`;
+    if (it.t === 'call' && it.body) {
+      h += `<div class="cfile">inside ${esc(pname(it.to))}</div><ul class="inside">${inside(it.body, it.to).map((l) => `<li>${esc(l)}</li>`).join('')}</ul>`;
+      h += `<button type="button" class="pbtn" data-act="toggle" data-id="${it.id}">${open.has(it.id) ? '▾ close in the diagram' : '▸ open in the diagram'}</button>`;
+    }
+    if (it.opens) {
+      const i = M.stories.findIndex((s) => s.id === 'open:' + it.opens);
+      if (i >= 0) h += `<button type="button" class="pbtn" data-act="story" data-id="${i}">› this starts the story “${esc(M.stories[i].title)}”</button>`;
+    }
+    h += code(it.ref, 2);
+    if (it.target) h += code(it.target, 0, 40, `goes to ${it.target.file} · ${it.target.from === it.target.to ? 'line ' + it.target.from : 'lines ' + it.target.from + '-' + it.target.to} (the definition)`);
+  }
+  $('panel').innerHTML = h + `<p class="hint">Click an arrow with ▸ to open what happens inside. Click anything to see the lines behind it.</p>`;
+}
+
+// ---------- interaction ----------
+function act(o) {
+  if (o.type === 'msg' && o.it.t === 'call' && o.it.body) { open.has(o.it.id) ? open.delete(o.it.id) : open.add(o.it.id); sel = o.it.id; }
+  else if (o.synth) { open.add(o.synth.id); sel = o.synth.id; }
+  else if (o.exitsOf) { exitsOpen.has(o.exitsOf) ? exitsOpen.delete(o.exitsOf) : exitsOpen.add(o.exitsOf); sel = o.it.id; }
+  else sel = o.it.id;
+  render();
+}
+function render() { draw(); toolbar(); panel(); }
+function handle(t) {
+  if (t.dataset.k) return act(ops[+t.dataset.k]);
+  if (t.dataset.p) { sel = 'p:' + t.dataset.p; return render(); }
+  if (t.dataset.f) { sel = 'f:' + t.dataset.f; return render(); }
+  const a = t.dataset.act;
+  if (a === 'story') return load(M.stories[+t.dataset.id]);
+  if (a === 'all') { allCalls.forEach((c) => { open.add(c.id); exitsOpen.add(c.id); }); }
+  else if (a === 'none') { open.clear(); exitsOpen.clear(); }
+  else if (a === 'zout') zoom = Math.max(0.3, Math.round((zNow - 0.15) * 100) / 100);
+  else if (a === 'zin') zoom = Math.min(2, Math.round((zNow + 0.15) * 100) / 100);
+  else if (a === 'zfit') zoom = null;
+  else if (a === 'every') every = !every;
+  else if (a === 'en') en = !en;
+  else if (a === 'toggle') { const id = t.dataset.id; open.has(id) ? open.delete(id) : open.add(id); }
+  render();
+}
+document.addEventListener('click', (e) => { const t = e.target.closest('[data-k],[data-p],[data-f],[data-act]'); if (t) handle(t); });
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  const t = e.target.closest && e.target.closest('[data-k],[data-p]');
+  if (!t) return;
+  e.preventDefault(); handle(t);
+});
+$('q').addEventListener('input', side);
+window.addEventListener('resize', () => { if (zoom === null) render(); });
+let start = 0;
+try { const h = parseInt(location.hash.slice(1), 10); if (h >= 0 && h < M.stories.length) start = h; } catch (e) {}
+load(M.stories[start]);
+})();
+</script>

@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>plainfold demo</title>
+<meta name="description" content="plainfold reads a codebase into stories: sequence diagrams that lead down to the real lines. A demo on four projects.">
+<style>
+  /* the app's own colors and fonts (app/src/styles.css) */
+  :root {
+    --ui: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, "Cascadia Mono", Consolas, monospace;
+    --win: #ffffff; --side: #f4f4f6; --border: #e4e4e8; --fg: #1c1c1f; --fg2: #4a4a52; --fg3: #6b6b74;
+    --accent: #0a62e0; --accent-soft: #e8f0fd; --on-accent: #ffffff; --pill: #eaeaee;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --win: #1a1a1d; --side: #222226; --border: #2e2e34; --fg: #e8e8ec; --fg2: #b6b6be; --fg3: #8f8f98;
+      --accent: #6aa5ff; --accent-soft: #1e2a3f; --on-accent: #10131a; --pill: #2c2c31;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--win); color: var(--fg); font: 15px/1.55 var(--ui); }
+  main { max-width: 880px; margin: 0 auto; padding: 56px 16px 64px; }
+  h1 { font-size: 28px; line-height: 1.2; margin: 0 0 8px; letter-spacing: -0.01em; }
+  h2 { font-size: 15px; margin: 40px 0 12px; color: var(--fg3); font-weight: 600; }
+  p { margin: 0 0 12px; color: var(--fg2); max-width: 680px; }
+  a { color: var(--accent); }
+  code { font-family: var(--mono); font-size: 0.9em; }
+  .shot { display: block; width: 100%; height: auto; margin: 28px 0 0; border: 1px solid var(--border); border-radius: 10px; }
+  .projects { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(380px, 100%), 1fr)); gap: 12px; }
+  .card { display: flex; flex-direction: column; gap: 6px; padding: 16px; border: 1px solid var(--border); border-radius: 10px; background: var(--side); color: inherit; text-decoration: none; }
+  .card:hover { border-color: var(--accent); }
+  .card .name { font-weight: 600; font-size: 16px; }
+  .card .what { color: var(--fg2); font-size: 14px; flex: 1; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { font-size: 12px; padding: 1px 8px; border-radius: 999px; background: var(--pill); color: var(--fg2); }
+  .open { align-self: flex-start; margin-top: 6px; font-size: 13px; font-weight: 500; padding: 4px 12px; border-radius: 6px; background: var(--accent); color: var(--on-accent); }
+  .note { margin-top: 14px; font-size: 13px; color: var(--fg3); }
+  footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 13px; color: var(--fg3); }
+  footer a { color: inherit; }
+  @media (max-width: 440px) { main { padding-top: 32px; } h1 { font-size: 24px; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>plainfold</h1>
+  <p>A desktop app that reads a codebase and shows what it does as <strong>stories</strong>: what happens when a screen opens, a button is pressed, a request arrives or a job runs. Each story is a sequence diagram, and every step leads down to the lines that wrote it.</p>
+  <p>Below is the app's real interface in the browser, on models it read earlier. The desktop app reads a project folder itself, with language servers, and never runs the project's code.</p>
+
+  <picture>
+    <source srcset="screenshots/story-dark.png" media="(prefers-color-scheme: dark)">
+    <img class="shot" src="screenshots/story-light.png" width="2880" height="1800" alt="A story in plainfold: a form submit in the browser, the API route it calls on the server, the rules that can end it, and the code of the selected step.">
+  </picture>
+
+  <h2>Open a project</h2>
+  <div class="projects">
+    <a class="card" href="app/?preview=../models/bookshelf.json&amp;story=action%3A%2Fbooks%2Fnew%23save">
+      <span class="name">bookshelf</span>
+      <span class="tags"><span class="tag">TypeScript</span><span class="tag">Next.js</span><span class="tag">Supabase</span></span>
+      <span class="what">The small sample in this repository. Opens at the “Save” button: the form, the API route it calls, and the four ways it can stop.</span>
+      <span class="open">Open</span>
+    </a>
+    <a class="card" href="app/?preview=../models/next-saas-starter.json&amp;story=action%3APricingCard%23checkoutAction">
+      <span class="name">next-saas-starter</span>
+      <span class="tags"><span class="tag">TypeScript</span><span class="tag">Next.js server actions</span><span class="tag">Drizzle</span><span class="tag">Stripe</span></span>
+      <span class="what">A SaaS starter. Opens at checkout: a form that runs a server action, the session check before it, and Stripe.</span>
+      <span class="open">Open</span>
+    </a>
+    <a class="card" href="app/?preview=../models/full-stack-fastapi-template.json&amp;story=action%3ADeleteUser%23onSubmit">
+      <span class="name">full-stack-fastapi-template</span>
+      <span class="tags"><span class="tag">React</span><span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">TanStack Query</span></span>
+      <span class="what">Two languages in one model. Opens at a React “Delete” button: open its call to follow the request into the FastAPI endpoint that answers it.</span>
+      <span class="open">Open</span>
+    </a>
+    <a class="card" href="app/?preview=../models/compass_app.json&amp;story=function%3Aapp%2Flib%2Fui%2Fbooking%2Fview_models%2Fbooking_viewmodel.dart%23BookingViewModel._createBooking">
+      <span class="name">compass_app</span>
+      <span class="tags"><span class="tag">Dart</span><span class="tag">Flutter</span><span class="tag">provider</span></span>
+      <span class="what">Flutter's sample travel app. Opens at creating a booking, with the branches its results take.</span>
+      <span class="open">Open</span>
+    </a>
+  </div>
+  <p class="note">Best on a desktop browser. Click a call to open it, a step to see its code; Parts and Functions change the columns.</p>
+
+  <footer>
+    <a href="https://github.com/alpcakin/plainfold">Source on GitHub</a> ·
+    <a href="https://github.com/alpcakin/plainfold/blob/main/demo/models/THIRD_PARTY.md">The three open-source projects and their licenses</a>
+  </footer>
+</main>
+</body>
+</html>

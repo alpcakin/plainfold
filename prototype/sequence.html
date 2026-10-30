@@ -1,0 +1,963 @@
+<title>plainfold sequence view</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: a quiet, text-first terminal page. Flows and setup on the left, the diagram in the middle, details on the right.
+   No boxes anywhere: hierarchy comes from type weight, color, indentation, whitespace and a few hairlines. Light by default, dark on request. */
+:root{
+  --bg:#fbfbfa; --fg:#1f2328; --fg-2:#59616b; --fg-3:#959ba3; --rule:#e6e7e9; --box:#f3f4f6; --box-line:#d6d9de; --frame:#f7f7f6;
+  --accent:#2f5ccc; --chg:#a96400; --chg-bg:rgba(214,146,20,.13); --warn:#c2362b; --ok:#2e7d50;
+  --c-kw:#9a3fbf; --c-str:#2a7a3f; --c-num:#b5541a; --c-fn:#2c5fc4; --c-type:#0f7f86; --c-prop:#8a5a00; --c-cm:#959ba3;
+  --mono:"Geist Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+:root[data-theme="dark"]{
+  --bg:#15171b; --fg:#e4e6ea; --fg-2:#a7aeb7; --fg-3:#6b727c; --rule:#2a2e35; --box:#1f2228; --box-line:#363b45; --frame:#191b20;
+  --accent:#8ea6ff; --chg:#e2b25a; --chg-bg:rgba(226,178,90,.13); --warn:#f07b6f; --ok:#6cc18c;
+  --c-kw:#c792ea; --c-str:#a5d6a7; --c-num:#f0a46c; --c-fn:#82aaff; --c-type:#7fdbca; --c-prop:#e6c07b; --c-cm:#6b727c;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:13.5px/1.65 var(--mono);-webkit-font-smoothing:antialiased;padding-block:20px;padding-inline:28px;overflow:hidden}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+:focus-visible{outline:1px solid var(--accent);outline-offset:3px}
+*{scrollbar-width:thin;scrollbar-color:var(--rule) transparent}
+.scroller{height:100%;overflow-x:auto}
+.app{height:100%;min-width:1140px;display:grid;grid-template-rows:auto minmax(0,1fr) auto}
+
+/* top and bottom lines */
+.top{display:flex;align-items:baseline;gap:20px;padding-bottom:14px;border-bottom:1px solid var(--rule);white-space:nowrap}
+.top .brand{font-weight:600}
+.top .path{color:var(--fg-3)}
+.top .r{margin-left:auto;display:flex;gap:22px;color:var(--fg-2)}
+.ok{color:var(--ok)}
+.chgc{color:var(--chg)}
+.lk{color:var(--accent)}
+.lk:hover,.chgc:hover,.ni:hover .t,.row:hover .t{text-decoration:underline;text-underline-offset:3px}
+.foot{display:flex;gap:24px;padding-top:12px;border-top:1px solid var(--rule);color:var(--fg-3);font-size:12px;white-space:nowrap}
+
+.main{display:grid;grid-template-columns:230px minmax(0,1fr) 340px;column-gap:36px;min-height:0;padding-top:22px}
+.nav,.center,.panel{min-height:0;overflow:auto}
+.panel{padding-left:28px;border-left:1px solid var(--rule)}
+
+/* nav */
+.h{color:var(--fg);font-weight:600;margin:0 0 6px}
+.hs{color:var(--fg-3);font-weight:400;margin-right:8px}
+.h2{color:var(--fg-3);font-size:12px;margin:14px 0 4px}
+.ni{display:grid;grid-template-columns:16px minmax(0,1fr) auto;column-gap:4px;width:100%;padding:3px 0;color:var(--fg-2);line-height:1.5}
+.ni .mk{color:var(--accent)}
+.ni.sel{color:var(--fg)}
+.ni .tag{font-size:11.5px;color:var(--fg-3);padding-left:10px;white-space:nowrap}
+.ni .tag.warn{color:var(--warn)}
+.ni .tag.chg{color:var(--chg)}
+.nav .sp{height:22px}
+.nav .note{margin-top:22px;font-size:11.5px;color:var(--fg-3);line-height:1.6}
+
+/* center */
+.title{margin:0;font-size:16px;font-weight:600}
+.title .hs{margin-right:10px}
+.meta{margin-top:6px;color:var(--fg-2);font-size:12.5px}
+.meta .k{color:var(--fg-3);display:inline-block;width:76px}
+.legend{margin-top:12px;display:flex;flex-wrap:wrap;gap:22px;font-size:11.5px;color:var(--fg-3);align-items:center}
+.legend svg{vertical-align:middle;margin-right:6px}
+.legend .tb{margin-left:auto;display:flex;gap:16px}
+svg.seq{display:block;margin-top:8px}
+svg text{font-family:var(--mono)}
+.pt{cursor:pointer}
+.pt .lb{font-size:13px;font-weight:600;fill:var(--fg)}
+.pt .sb{font-size:11px;fill:var(--fg-3)}
+.pt .sb.more{fill:var(--accent)}
+.pt .bx{fill:var(--box);stroke:var(--box-line);stroke-width:1}
+.pt:hover .bx{stroke:var(--fg-3)}
+.pt:hover .lb,.pt.sel .lb{fill:var(--accent)}
+.pt.sel .bx{stroke:var(--accent)}
+.pt.chgd .bx{stroke:var(--chg)}
+.pt .dot{fill:var(--chg);font-size:11px}
+.grp{cursor:pointer}
+.grp line{stroke:var(--fg-3);stroke-width:1}
+.grp text{font-size:11.5px;fill:var(--fg-3)}
+.grp:hover text{fill:var(--accent)}
+.life{stroke:var(--rule);stroke-dasharray:2 4}
+.num{font-size:11px;fill:var(--fg-3)}
+.m,.s{cursor:pointer}
+.m .ln,.s .ln{fill:none;stroke:var(--fg-2);stroke-width:1.3}
+.m.ret .ln{stroke:var(--fg-3);stroke-width:1}
+.m.inf .ln{stroke-dasharray:5 4}
+.m .hit,.s .hit{fill:none;stroke:transparent;stroke-width:18}
+.m text,.s text{font-size:12.5px;fill:var(--fg);paint-order:stroke;stroke:var(--bg);stroke-width:6px;stroke-linejoin:round}
+.m.ret text{fill:var(--fg-2)}
+.m text .rk{fill:var(--warn)}
+.m text .cf{fill:var(--ok)}
+.m:hover .ln,.s:hover .ln{stroke:var(--fg)}
+.m.chg .ln{stroke:var(--chg)}
+.m.chg text{fill:var(--chg)}
+.m.sel .ln,.s.sel .ln{stroke:var(--accent)}
+.m.sel text,.s.sel text{fill:var(--accent)}
+.fr .bx{fill:var(--frame);stroke:var(--box-line);stroke-width:1}
+.fr .tab{fill:var(--box);stroke:var(--box-line);stroke-width:1}
+.fr.closed .bx{fill:transparent;stroke-dasharray:4 3}
+.fr.chg .bx,.fr.chg .tab{stroke:var(--chg)}
+.fr text{font-size:11.5px;fill:var(--fg-2)}
+.fr .kw{fill:var(--fg)}
+.fr.tg{cursor:pointer}
+.fr.tg:hover text{fill:var(--accent)}
+.fr.chg text{fill:var(--chg)}
+.fr.tg:hover .bx{stroke:var(--accent)}
+
+/* panel */
+.pp h2{margin:0;font-size:14.5px;font-weight:600;line-height:1.45}
+.pp h2.code{color:var(--accent)}
+.route{margin-top:2px;color:var(--fg-3);font-size:12px}
+.lead{margin:12px 0 0;color:var(--fg-2)}
+.kv{display:grid;grid-template-columns:92px minmax(0,1fr);column-gap:12px;margin-top:14px}
+.kv > div{padding:2px 0}
+.kv .k{color:var(--fg-3)}
+.kv .warn{color:var(--warn)}
+.was{display:block;color:var(--fg-3);text-decoration:line-through}
+.sec{margin:22px 0 6px;color:var(--fg-3);font-size:12px}
+.steps{margin:0;padding:0;list-style:none;counter-reset:s}
+.steps li{display:grid;grid-template-columns:22px minmax(0,1fr);padding:2px 0;counter-increment:s;color:var(--fg-2)}
+.steps li::before{content:counter(s);color:var(--fg-3);font-size:12px}
+.steps li.new{color:var(--chg)}
+.acts{display:flex;flex-wrap:wrap;gap:18px;margin-top:14px}
+.howto{margin:0;padding:0;list-style:none;color:var(--fg-2)}
+.howto li{padding:2px 0}
+.howto li::before{content:"- ";color:var(--fg-3)}
+.cfile{margin:14px 0 4px;color:var(--fg-3);font-size:12px}
+.code{font-size:12px;line-height:1.7;overflow-x:auto}
+.code-in{display:inline-block;min-width:100%}
+.cl{display:flex;white-space:pre;padding-right:8px}
+.cn{flex:none;width:34px;padding-right:12px;text-align:right;color:var(--fg-3);user-select:none}
+.cl.hl{background:var(--chg-bg)}
+.cl.hl .cn{color:var(--chg)}
+.c-kw{color:var(--c-kw)} .c-str{color:var(--c-str)} .c-num{color:var(--c-num)} .c-fn{color:var(--c-fn)} .c-type{color:var(--c-type)} .c-prop{color:var(--c-prop)} .c-var{color:var(--fg)} .c-cm{color:var(--c-cm);font-style:italic}
+.toast{color:var(--ok)}
+
+/* setup views */
+.lines{margin-top:18px}
+.row{display:grid;column-gap:18px;width:100%;padding:4px 0;color:var(--fg-2);align-items:baseline}
+.row .mk{color:var(--accent)}
+.row.sel{color:var(--fg)}
+.row .t{color:var(--fg)}
+.row .f{color:var(--fg-3);font-size:12px}
+.thead{display:grid;column-gap:18px;padding-bottom:6px;color:var(--fg-3);font-size:12px}
+.set{grid-template-columns:14px 300px 210px 170px minmax(0,1fr)}
+.lib{grid-template-columns:14px 260px minmax(0,1fr)}
+.ship{grid-template-columns:14px 28px 240px minmax(0,1fr)}
+.vis-pub{color:var(--chg)}
+.vis-sec{color:var(--ok)}
+.trig{margin-top:18px}
+.trig .t{color:var(--chg)}
+.mapsvg{display:block;width:100%;max-width:880px;height:auto;margin-top:16px}
+.nd{cursor:pointer}
+.nd .bx{fill:var(--box);stroke:var(--box-line);stroke-width:1}
+.nd:hover .bx,.nd.sel .bx{stroke:var(--accent)}
+.nd.chg .bx{stroke:var(--chg)}
+.nd .t1{font-size:15px;font-weight:600;fill:var(--fg)}
+.nd .t2{font-size:12.5px;fill:var(--fg-3)}
+.nd .t2.lk2{fill:var(--accent)}
+.nd .t2.c2{fill:var(--chg)}
+.nd.chg .t1{fill:var(--chg)}
+.nd:hover .t1,.nd.sel .t1{fill:var(--accent)}
+.ed{fill:none;stroke:var(--fg-3);stroke-width:1.2}
+.ed.inf{stroke-dasharray:5 4}
+.ed.chg{stroke:var(--chg)}
+.el{font-size:12px;fill:var(--fg-3);paint-order:stroke;stroke:var(--bg);stroke-width:6px;stroke-linejoin:round}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="scroller"><div class="app" id="app">
+  <div class="top">
+    <span class="brand">plainfold</span><span class="path">~/projects/bookshelf</span>
+    <span class="r" id="topr"></span>
+  </div>
+  <div class="main">
+    <nav class="nav" id="nav" aria-label="Flows and setup"></nav>
+    <section class="center" id="center" aria-label="Diagram"></section>
+    <aside class="panel" id="panel" aria-label="Details"></aside>
+  </div>
+  <div class="foot" id="foot"></div>
+</div></div>
+
+<!-- the sample project: the diagrams point into these files -->
+<script type="text/plain" id="code-app/page.tsx">
+"use client";
+import { useEffect, useState } from "react";
+import { BookCard } from "@/components/BookCard";
+import type { Book } from "@/types/book";
+
+export default function HomePage() {
+  const [books, setBooks] = useState<Book[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/books?page=1")
+      .then((res) => res.json())
+      .then((json) => setBooks(json.books ?? []))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <p className="p-8 text-neutral-500">Loading your shelf…</p>;
+
+  return (
+    <main className="grid grid-cols-2 gap-4 p-8 md:grid-cols-4">
+      {books.map((book) => (
+        <BookCard key={book.id} book={book} />
+      ))}
+    </main>
+  );
+}
+</script>
+<script type="text/plain" id="code-app/books/new/page.tsx">
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+
+export default function NewBookPage() {
+  const router = useRouter();
+  const [error, setError] = useState("");
+
+  async function save(form: FormData) {
+    const res = await fetch("/api/books", {
+      method: "POST",
+      body: JSON.stringify({
+        title: form.get("title"),
+        author: form.get("author"),
+        isbn: form.get("isbn") || null,
+      }),
+    });
+    if (!res.ok) {
+      setError((await res.json()).error);
+      return;
+    }
+    router.push("/");
+  }
+
+  return (
+    <form action={save} className="grid gap-3 p-8">
+      <input name="title" placeholder="Title" />
+      <input name="author" placeholder="Author" />
+      <input name="isbn" placeholder="ISBN (optional)" />
+      {error && <p className="text-red-600">{error}</p>}
+      <button type="submit">Save</button>
+    </form>
+  );
+}
+</script>
+<script type="text/plain" id="code-components/BookCard.tsx">
+import Link from "next/link";
+import type { Book } from "@/types/book";
+
+export function BookCard({ book }: { book: Book }) {
+  return (
+    <Link href={`/books/${book.id}`} className="rounded-xl border p-3 hover:shadow">
+      {book.coverUrl ? (
+        <img src={book.coverUrl} alt={book.title} className="aspect-[2/3] rounded-md" />
+      ) : (
+        <div className="aspect-[2/3] rounded-md bg-neutral-200" />
+      )}
+      <h3 className="mt-2 font-semibold">{book.title}</h3>
+      <p className="text-sm text-neutral-500">{book.author}</p>
+    </Link>
+  );
+}
+</script>
+<script type="text/plain" id="code-app/api/books/route.ts">
+import { NextResponse } from "next/server";
+import { getCurrentUser } from "@/lib/auth";
+import { supabase } from "@/lib/db";
+import { coverUrlFor } from "@/lib/covers";
+import type { Book } from "@/types/book";
+
+const PAGE_SIZE = 20;
+
+export async function GET(request: Request) {
+  const user = await getCurrentUser();
+  if (!user) {
+    return NextResponse.json({ error: "Not logged in" }, { status: 401 });
+  }
+
+  const url = new URL(request.url);
+  const page = Number(url.searchParams.get("page") ?? "1");
+  const from = (page - 1) * PAGE_SIZE;
+
+  const { data, error } = await supabase
+    .from("books")
+    .select("*")
+    .eq("owner_id", user.id)
+    .order("created_at", { ascending: false })
+    .range(from, from + PAGE_SIZE - 1);
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  const books: Book[] = data.map((book) => ({
+    ...book,
+    coverUrl: coverUrlFor(book.isbn),
+  }));
+
+  return NextResponse.json({ books, page });
+}
+
+export async function POST(request: Request) {
+  const user = await getCurrentUser();
+  if (!user) {
+    return NextResponse.json({ error: "Not logged in" }, { status: 401 });
+  }
+
+  const body = await request.json();
+  if (!body.title || !body.author) {
+    return NextResponse.json({ error: "Title and author are required" }, { status: 400 });
+  }
+
+  const { data, error } = await supabase
+    .from("books")
+    .insert({
+      title: body.title,
+      author: body.author,
+      isbn: body.isbn ?? null,
+      owner_id: user.id,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ book: data }, { status: 201 });
+}
+</script>
+<script type="text/plain" id="code-lib/auth.ts">
+import { cookies } from "next/headers";
+import { supabase } from "@/lib/db";
+
+export type User = { id: string; email: string };
+
+export async function getCurrentUser(): Promise<User | null> {
+  const token = (await cookies()).get("sb-access-token")?.value;
+  if (!token) return null;
+
+  const { data, error } = await supabase.auth.getUser(token);
+  if (error || !data.user) return null;
+  if (!data.user.email_confirmed_at) return null;
+
+  return { id: data.user.id, email: data.user.email ?? "" };
+}
+</script>
+<script type="text/plain" id="code-lib/covers.ts">
+const COVERS_BASE = "https://covers.openlibrary.org/b/isbn";
+
+export function coverUrlFor(isbn?: string | null): string | null {
+  if (!isbn) return null;
+  const clean = isbn.replace(/[^0-9X]/gi, "");
+  if (clean.length !== 10 && clean.length !== 13) return null;
+  return `${COVERS_BASE}/${clean}-M.jpg`;
+}
+</script>
+<script type="text/plain" id="code-supabase/functions/cleanup-deleted/index.ts">
+import { createClient } from "npm:@supabase/supabase-js@2";
+
+Deno.serve(async () => {
+  const supabase = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+  );
+
+  const cutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+  const { data, error } = await supabase
+    .from("books")
+    .delete()
+    .lt("deleted_at", cutoff)
+    .select("id");
+
+  if (error) return new Response(error.message, { status: 500 });
+
+  await fetch(Deno.env.get("MAIL_API_URL")!, {
+    method: "POST",
+    body: JSON.stringify({ subject: "Nightly cleanup", removed: data.length }),
+  });
+
+  return new Response(JSON.stringify({ removed: data.length }));
+});
+</script>
+<script type="text/plain" id="code-supabase/migrations/20260915_nightly_cleanup.sql">
+select cron.schedule(
+  'nightly-cleanup',
+  '0 3 * * *',
+  $$
+  select net.http_post(
+    url := 'https://bookshelf.supabase.co/functions/v1/cleanup-deleted',
+    headers := jsonb_build_object('Authorization', 'Bearer ' || current_setting('app.service_key'))
+  );
+  $$
+);
+</script>
+<script type="text/plain" id="code-Dockerfile">
+FROM node:20-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+ENV PORT=3000
+EXPOSE 3000
+CMD ["npm", "start"]
+</script>
+<script type="text/plain" id="code-.github/workflows/deploy.yml">
+name: Deploy
+on:
+  push:
+    branches: ["**"]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+</script>
+<script type="text/plain" id="code-.env.local">
+NEXT_PUBLIC_SUPABASE_URL=https://••••••••.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=••••••••••••••••••••••••
+</script>
+<script type="text/plain" id="code-package.json">
+{
+  "name": "bookshelf",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "next": "15.0.3",
+    "react": "19.0.0",
+    "react-dom": "19.0.0"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.14",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.4"
+  }
+}
+</script>
+
+<script>
+(() => {
+'use strict';
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $ = id => document.getElementById(id);
+const ROUTE = 'app/api/books/route.ts', AUTH = 'lib/auth.ts', HOME = 'app/page.tsx', NEW = 'app/books/new/page.tsx';
+const EDGE = 'supabase/functions/cleanup-deleted/index.ts', CRON = 'supabase/migrations/20260915_nightly_cleanup.sql';
+
+/* ---------- parts of the app ---------- */
+const P = {
+  browser:{label:'browser', group:true, kids:['home','addpage','bookcard'], about:'Everything that runs on the visitor’s screen.'},
+  home:{label:'home page', parent:'browser', file:HOME, range:['export default function HomePage','}'], about:'The home page. Loads your books and shows them as a grid.',
+    steps:['remembers the books (empty at first) and whether it is still loading','when the page opens, asks the server for your books','shows “Loading your shelf…” until they arrive','shows the books as a grid of BookCard tiles']},
+  addpage:{label:'add book page', parent:'browser', file:NEW, range:['export default function NewBookPage','}'], about:'A form for adding a book. Sends it to the server, then goes back to the home page.',
+    steps:['shows a form with title, author and an optional ISBN','when someone presses “Save”, sends the book to the server','if the server says no, shows its message under the form','if it worked, goes back to the home page']},
+  bookcard:{label:'BookCard', parent:'browser', file:'components/BookCard.tsx', range:['export function BookCard','}'], about:'One book tile. Tapping it opens that book’s page.',
+    steps:['shows a card that opens the book’s page when tapped','shows the cover, or a grey box if there is none','shows the title in bold and the author in grey']},
+  server:{label:'server', group:true, kids:['get','post','gcu','cov'], about:'Your app’s server code, running in a Docker container on Fly.io.'},
+  get:{label:'GET /api/books', parent:'server', file:ROUTE, range:['export async function GET','}'], about:'Lists your books, newest first, 20 at a time.',
+    steps:['asks getCurrentUser who is signed in','stops with 401 “Not logged in” if nobody is','reads the page number from the URL (default 1)','fetches your books, newest first, 20 at a time','stops with 500 if the database fails','adds a cover link to each book','sends back the books and the page number']},
+  post:{label:'POST /api/books', parent:'server', file:ROUTE, range:['export async function POST','}'], about:'Adds a new book to your shelf.',
+    steps:['asks getCurrentUser who is signed in','stops with 401 “Not logged in” if nobody is','reads what the page sent','stops with 400 if the title or author is missing','saves a new book owned by this user','stops with 500 if the database fails','sends back the saved book with status 201']},
+  gcu:{label:'getCurrentUser', parent:'server', file:AUTH, range:['export async function getCurrentUser','}'], about:'Finds out who is signed in, using the login cookie.', changed:true,
+    steps:['reads the login token from the sb-access-token cookie','gives back nothing if there is no token','asks Supabase who owns the token','gives back nothing if that fails',{t:'gives back nothing if the email isn’t confirmed yet', isNew:true},'gives back the user’s id and email']},
+  cov:{label:'coverUrlFor', parent:'server', file:'lib/covers.ts', range:['export function coverUrlFor','}'], about:'Builds the link to a book’s cover picture from its ISBN.',
+    steps:['gives back nothing if there is no ISBN','keeps only the digits and X','gives back nothing unless it is 10 or 13 characters long','builds the Open Library image link']},
+  caller:{label:'caller', sub:'GET or POST /api/books', about:'Whichever endpoint needs to know who is signed in.'},
+  scheduler:{label:'scheduler', sub:'pg_cron · daily 03:00', file:CRON, range:['select cron.schedule',');'], about:'A schedule stored in the database. Every day at 03:00 it calls the cleanup function.'},
+  cleanup:{label:'cleanup-deleted', sub:'edge function', file:EDGE, range:['Deno.serve','});'], about:'Permanently deletes books that were removed more than 30 days ago, then sends a summary to a mail service.',
+    steps:['connects to the database with the service role key','works out the cutoff: 30 days ago','deletes every book removed before the cutoff, in all accounts','stops with 500 if the database fails','sends the number of removed books to the mail service','answers with the number of removed books'], settings:['service','mail']},
+  db:{label:'database', sub:'books table', about:'Your Supabase database (Postgres).', settings:['url','anon']},
+  supa:{label:'Supabase login', sub:'outside service', about:'Supabase’s login service. It checks login tokens and knows which account each one belongs to.', settings:['url','anon']},
+  mail:{label:'mail service', sub:'from MAIL_API_URL', about:'An outside service whose address is stored in the MAIL_API_URL secret. plainfold can’t read secret values, so it doesn’t know which service this is.', settings:['mail']}
+};
+
+/* ---------- flows ----------
+   msg: from → to. ret: an answer. inf: inferred link. self: a step a part does on its own.
+   frame kinds: loop (open), alt (a side path, folded), shared (a shared part, folded).
+   code refs: [file, text on the first line, number of lines, optional text the search starts after] */
+const CHG_GCU = {text:'Now also gives back nothing when the email isn’t confirmed yet. People who haven’t confirmed their email are treated as signed out.', was:'Nothing only when there is no token or the check failed.'};
+const SIGNIN = from => [
+  {t:'msg', id:from + '-s1', from:'gcu', to:'supa', label:'who owns this token?', link:'exact · direct call', sends:'The login token from the sb-access-token cookie', back:'The account behind the token, or an error', caller:[AUTH,'supabase.auth.getUser',1]},
+  {t:'msg', id:from + '-s2', from:'supa', to:'gcu', ret:true, label:'the account', sends:'The account, including whether its email is confirmed', callee:[AUTH,'supabase.auth.getUser',3]}
+];
+const FLOWS = [
+  {id:'home', title:'When the home page opens', trigger:'the home page opens', entry:HOME, touches:'books table (reads) · Supabase login', changed:'2 min ago',
+   top:['browser','server','db','supa'], items:[
+    {t:'msg', id:'h1', from:'home', to:'get', label:'asks for your books', link:'exact · Next.js routing: /api/books → app/api/books/route.ts',
+     sends:'A request to /api/books?page=1, with the login cookie attached', back:'Your books and the page number', fails:'!The shelf stays empty and no error is shown',
+     caller:[HOME,'fetch("/api/books',4], callee:[ROUTE,'export async function GET',1]},
+    {t:'self', id:'h2', at:'home', label:'shows “Loading your shelf…”', about:'While it waits for the server, the page shows a loading line.', code:[HOME,'if (loading)',1]},
+    {t:'msg', id:'h3', from:'get', to:'gcu', label:'who is signed in?', link:'exact · direct call', sends:'Nothing. getCurrentUser reads the request’s cookies itself', back:'The signed-in user, or nothing',
+     caller:[ROUTE,'const user = await getCurrentUser',1], callee:[AUTH,'export async function getCurrentUser',1]},
+    {t:'frame', id:'h-sign', kind:'shared', label:'sign-in check', items:SIGNIN('h')},
+    {t:'msg', id:'h4', from:'gcu', to:'get', ret:true, chg:true, label:'the user, or nothing', change:CHG_GCU,
+     sends:'The user’s id and email. Nothing if there is no token, the check failed, or the email isn’t confirmed', caller:[AUTH,'if (error ||',4], callee:[ROUTE,'const user = await getCurrentUser',1]},
+    {t:'frame', id:'h-nouser', kind:'alt', label:'if nobody is signed in', items:[
+      {t:'msg', id:'h5', from:'get', to:'home', ret:true, label:'401 “Not logged in”', sends:'An error with status 401', fails:'!The home page doesn’t check for this. It shows an empty shelf with no message',
+       caller:[ROUTE,'if (!user)',3], callee:[HOME,'.then((res)',2]}]},
+    {t:'msg', id:'h6', from:'get', to:'db', label:'your books, newest first', link:'exact · Supabase client call on the books table',
+     sends:'Rows of books owned by this user, newest first, rows 1 to 20 for page 1', back:'Up to 20 books', fails:'The server stops with 500 and the database’s error message', caller:[ROUTE,'await supabase',6]},
+    {t:'msg', id:'h7', from:'db', to:'get', ret:true, label:'up to 20 books', sends:'Each book’s id, title, author, ISBN, owner and dates', callee:[ROUTE,'if (error)',3]},
+    {t:'self', id:'h8', at:'server', onlyCollapsed:'server', label:'adds a cover link to each', about:'For every book, the server asks coverUrlFor for a cover image link and adds it to the book.', code:[ROUTE,'data.map',4]},
+    {t:'frame', id:'h-covers', kind:'loop', label:'for each book', items:[
+      {t:'msg', id:'h9', from:'get', to:'cov', label:'cover link for this ISBN?', link:'exact · direct call', sends:'The book’s ISBN, which may be empty', back:'An Open Library image link, or nothing',
+       caller:[ROUTE,'coverUrl: coverUrlFor',1], callee:['lib/covers.ts','export function coverUrlFor',6]},
+      {t:'msg', id:'h10', from:'cov', to:'get', ret:true, label:'a link, or nothing', sends:'A covers.openlibrary.org image link, or nothing if the ISBN is missing or the wrong length', callee:[ROUTE,'coverUrl: coverUrlFor',1]}]},
+    {t:'msg', id:'h11', from:'get', to:'home', ret:true, label:'the books and the page number', sends:'The list of books, each with its cover link, plus the page number', caller:[ROUTE,'return NextResponse.json({ books',1], callee:[HOME,'.then((json)',1]},
+    {t:'self', id:'h12', at:'browser', onlyCollapsed:'browser', label:'shows them as a grid', about:'The page draws one tile per book: two columns on phones, four on wider screens.', code:[HOME,'<main className',5]},
+    {t:'frame', id:'h-tiles', kind:'loop', label:'for each book', items:[
+      {t:'msg', id:'h13', from:'home', to:'bookcard', label:'draw this book', link:'exact · component import', sends:'One book', back:'A tile with the cover (or a grey box), title and author', caller:[HOME,'<BookCard key',1], callee:['components/BookCard.tsx','export function BookCard',13]},
+      {t:'msg', id:'h14', from:'bookcard', to:'home', ret:true, label:'a book tile', sends:'The finished tile, ready to show', caller:['components/BookCard.tsx','return (',11]}]}
+  ]},
+  {id:'save', title:'When someone presses “Save”', trigger:'the “Save” button on the add book page', entry:NEW, touches:'books table (writes) · Supabase login', risk:'writes data', changed:'2 min ago',
+   top:['browser','server','db','supa'], items:[
+    {t:'self', id:'s0', at:'addpage', label:'collects title, author and ISBN', about:'The form has three fields. The ISBN is optional.', code:[NEW,'<form action={save}',6]},
+    {t:'msg', id:'s1', from:'addpage', to:'post', label:'save this book', link:'exact · Next.js routing: POST /api/books → app/api/books/route.ts',
+     sends:'The title, author and ISBN (or empty), with the login cookie attached', back:'The saved book, or an error message', caller:[NEW,'const res = await fetch',8], callee:[ROUTE,'export async function POST',1]},
+    {t:'msg', id:'s2', from:'post', to:'gcu', label:'who is signed in?', link:'exact · direct call', sends:'Nothing. getCurrentUser reads the request’s cookies itself', back:'The signed-in user, or nothing',
+     caller:[ROUTE,'const user = await getCurrentUser',1,'export async function POST'], callee:[AUTH,'export async function getCurrentUser',1]},
+    {t:'frame', id:'s-sign', kind:'shared', label:'sign-in check', items:SIGNIN('s')},
+    {t:'msg', id:'s3', from:'gcu', to:'post', ret:true, chg:true, label:'the user, or nothing', change:CHG_GCU,
+     sends:'The user’s id and email. Nothing if there is no token, the check failed, or the email isn’t confirmed', caller:[AUTH,'if (error ||',4], callee:[ROUTE,'const user = await getCurrentUser',1,'export async function POST']},
+    {t:'frame', id:'s-nouser', kind:'alt', label:'if nobody is signed in', items:[
+      {t:'msg', id:'s4', from:'post', to:'addpage', ret:true, label:'401 “Not logged in”', sends:'An error with status 401', fails:'The page shows “Not logged in” under the form',
+       caller:[ROUTE,'if (!user)',3,'export async function POST'], callee:[NEW,'if (!res.ok)',4]}]},
+    {t:'frame', id:'s-missing', kind:'alt', label:'if the title or author is missing', items:[
+      {t:'msg', id:'s5', from:'post', to:'addpage', ret:true, label:'400 “Title and author are required”', sends:'An error with status 400', fails:'The page shows the message under the form',
+       caller:[ROUTE,'if (!body.title',3], callee:[NEW,'if (!res.ok)',4]}]},
+    {t:'msg', id:'s6', from:'post', to:'db', label:'add this book', risk:'writes data', link:'exact · Supabase client call on the books table',
+     sends:'A new row in books: title, author, ISBN (or empty), owner = this user', back:'The saved row', fails:'The server stops with 500 and the database’s error message', caller:[ROUTE,'await supabase',10,'export async function POST']},
+    {t:'msg', id:'s7', from:'db', to:'post', ret:true, label:'the saved book', sends:'The new row, with its id and dates', callee:[ROUTE,'if (error)',3,'export async function POST']},
+    {t:'msg', id:'s8', from:'post', to:'addpage', ret:true, label:'the saved book · 201', sends:'The saved book with status 201', caller:[ROUTE,'return NextResponse.json({ book',1], callee:[NEW,'if (!res.ok)',5]},
+    {t:'self', id:'s9', at:'addpage', label:'goes back to the home page', about:'After a successful save, the page sends the visitor back to the home page.', code:[NEW,'router.push',1]}
+  ]},
+  {id:'signin', title:'Sign-in check', shared:true, trigger:'called by other parts (shared)', entry:AUTH, touches:'Supabase login', changed:'2 min ago', usedBy:['home','save'],
+   top:['caller','gcu','supa'], items:[
+    {t:'msg', id:'g1', from:'caller', to:'gcu', label:'who is signed in?', link:'exact · direct call', sends:'Nothing. It reads the request’s cookies itself', back:'The signed-in user, or nothing', callee:[AUTH,'export async function getCurrentUser',1]},
+    {t:'self', id:'g2', at:'gcu', label:'reads the token from the login cookie', about:'Reads the sb-access-token cookie that Supabase set when the person signed in.', code:[AUTH,'const token',1]},
+    {t:'frame', id:'g-notoken', kind:'alt', label:'if there is no token', items:[
+      {t:'msg', id:'g3', from:'gcu', to:'caller', ret:true, label:'nothing', sends:'Nothing: the person is treated as signed out', caller:[AUTH,'if (!token)',1]}]},
+    {t:'msg', id:'g4', from:'gcu', to:'supa', label:'who owns this token?', link:'exact · direct call', sends:'The login token', back:'The account, or an error', caller:[AUTH,'supabase.auth.getUser',1]},
+    {t:'msg', id:'g5', from:'supa', to:'gcu', ret:true, label:'the account', sends:'The account, including whether its email is confirmed', callee:[AUTH,'supabase.auth.getUser',1]},
+    {t:'frame', id:'g-fail', kind:'alt', label:'if that fails', items:[
+      {t:'msg', id:'g6', from:'gcu', to:'caller', ret:true, label:'nothing', sends:'Nothing: the person is treated as signed out', caller:[AUTH,'if (error ||',1]}]},
+    {t:'frame', id:'g-unconfirmed', kind:'alt', label:'if the email isn’t confirmed', chg:true, items:[
+      {t:'msg', id:'g7', from:'gcu', to:'caller', ret:true, chg:true, label:'nothing', sends:'Nothing: the person is treated as signed out', change:{text:'New check. People who haven’t confirmed their email are now treated as signed out.', was:'This check didn’t exist.'}, caller:[AUTH,'email_confirmed_at',1]}]},
+    {t:'msg', id:'g8', from:'gcu', to:'caller', ret:true, label:'the user’s id and email', sends:'The id and email of the signed-in person', caller:[AUTH,'return { id',1]}
+  ]},
+  {id:'nightly', title:'Every night at 03:00', trigger:'a schedule in the database (pg_cron)', entry:CRON, touches:'books table (deletes, every account) · mail service', risk:'deletes data',
+   top:['scheduler','cleanup','db','mail'], items:[
+    {t:'msg', id:'n1', from:'scheduler', to:'cleanup', label:'run the cleanup', link:'exact · the URL names the function: /functions/v1/cleanup-deleted',
+     sends:'An empty request with the service key, every day at 03:00', back:'How many books were removed', caller:[CRON,'select net.http_post',4], callee:[EDGE,'Deno.serve',1]},
+    {t:'self', id:'n2', at:'cleanup', label:'works out the cutoff: 30 days ago', about:'Takes today’s date and goes back 30 days.', code:[EDGE,'const cutoff',1]},
+    {t:'msg', id:'n3', from:'cleanup', to:'db', label:'delete books removed before the cutoff', risk:'deletes data', link:'exact · Supabase client call on the books table',
+     sends:'Delete every book whose deleted_at is older than 30 days, in every account', back:'The ids of the deleted books', fails:'The function stops with 500',
+     note:'Uses the service role key, which bypasses Row Level Security. That is why it can delete books from every account.', caller:[EDGE,'const { data, error } = await supabase',5]},
+    {t:'msg', id:'n4', from:'db', to:'cleanup', ret:true, label:'the deleted ids', sends:'The ids of the books it deleted', callee:[EDGE,'const { data, error }',1]},
+    {t:'frame', id:'n-fail', kind:'alt', label:'if the database fails', items:[
+      {t:'msg', id:'n5', from:'cleanup', to:'scheduler', ret:true, label:'500 with the error', sends:'The database’s error message with status 500', caller:[EDGE,'if (error) return',1]}]},
+    {t:'msg', id:'n6', from:'cleanup', to:'mail', inf:true, label:'how many were removed', link:'inferred · the address comes from MAIL_API_URL, a secret plainfold can’t read',
+     sends:'A message with the subject “Nightly cleanup” and the number of removed books', caller:[EDGE,'await fetch(Deno.env.get("MAIL_API_URL")',4],
+     fix:'In supabase/functions/cleanup-deleted/index.ts the summary is sent to MAIL_API_URL. Add the mail provider’s base URL (not the key) to supabase/.env.example so it is visible in the repository.'},
+    {t:'msg', id:'n7', from:'cleanup', to:'scheduler', ret:true, label:'how many were removed', sends:'The number of removed books. Nothing reads this answer', caller:[EDGE,'return new Response(JSON.stringify',1]}
+  ]}
+];
+const FLOW = Object.fromEntries(FLOWS.map(f => [f.id, f]));
+const BY_ID = {};
+for (const f of FLOWS) (function idx(items) { for (const it of items) { BY_ID[it.id] = it; if (it.items) idx(it.items); } })(f.items);
+
+/* ---------- setup ---------- */
+const SHIP = [
+  {id:'checkout', t:'gets the code', f:'from GitHub', lines:[9,9], about:'Downloads the code that was just pushed.'},
+  {id:'node', t:'sets up node 20', f:'same version as the Dockerfile', lines:[10,12], about:'Installs Node 20, the same version the Dockerfile uses.'},
+  {id:'install', t:'installs packages', f:'exact versions', lines:[13,13], about:'Installs the exact package versions recorded in package-lock.json.'},
+  {id:'test', t:'runs the tests', f:'stops if any fail', lines:[14,14], about:'Runs npm test (Vitest). If a test fails, the pipeline stops and nothing is deployed.'},
+  {id:'build', t:'builds the app', f:'next build', lines:[15,15], about:'Prepares the app for release. If the build fails, nothing is deployed.'},
+  {id:'deploy', t:'deploys to fly.io', f:'uses FLY_API_TOKEN', lines:[16,19], about:'Installs Fly’s command-line tool and deploys the app, using the FLY_API_TOKEN secret stored in GitHub.'}
+];
+const TRIGGER = {id:'trigger', t:'on every push, to any branch', lines:[2,4], about:'Starts the pipeline whenever someone pushes code to GitHub.',
+  chg:{text:'Now deploys from every branch, not only main. Unfinished work on any branch goes live.', was:'Only pushes to main were deployed.'}};
+const SETTINGS = [
+  {id:'url', name:'NEXT_PUBLIC_SUPABASE_URL', what:'Supabase project address', where:'.env.local', used:'database, Supabase login', vis:'public', code:['.env.local','NEXT_PUBLIC_SUPABASE_URL',1],
+   note:'Anything that starts with NEXT_PUBLIC_ is sent to the browser. That is fine for this address.'},
+  {id:'anon', name:'NEXT_PUBLIC_SUPABASE_ANON_KEY', what:'Supabase public key', where:'.env.local', used:'database, Supabase login', vis:'public', code:['.env.local','NEXT_PUBLIC_SUPABASE_ANON_KEY',1],
+   note:'Meant to be public. Your data stays protected only if Row Level Security is on for every table.'},
+  {id:'service', name:'SUPABASE_SERVICE_ROLE_KEY', what:'Full database access', where:'Supabase secrets', used:'cleanup-deleted', vis:'secret', code:[EDGE,'SUPABASE_SERVICE_ROLE_KEY',1],
+   note:'Bypasses Row Level Security. It must only be used on the server, as it is here.'},
+  {id:'mail', name:'MAIL_API_URL', what:'Where nightly summaries go', where:'Supabase secrets', used:'cleanup-deleted', vis:'secret', code:[EDGE,'MAIL_API_URL',1],
+   note:'plainfold can’t read secret values, so the mail service in the nightly flow is drawn as inferred.'},
+  {id:'fly', name:'FLY_API_TOKEN', what:'Permission to deploy to Fly.io', where:'GitHub secrets', used:'the deploy step', vis:'secret', code:['.github/workflows/deploy.yml','FLY_API_TOKEN',1],
+   note:'Stored in GitHub’s secret settings, never in the app or the repository.'},
+  {id:'port', name:'PORT', what:'Port the server listens on', where:'Dockerfile', used:'server', vis:'3000', code:['Dockerfile','ENV PORT',2], note:'Set to 3000 inside the container.'}
+];
+const BUILT = [
+  ['used by the app', [['next 15.0.3','pages, routing and the server'],['react 19','draws the screens'],['@supabase/supabase-js 2.45','talks to the database and the login service']]],
+  ['only while developing', [['tailwindcss 3.4','styling'],['typescript 5.6','catches mistakes before the app runs'],['vitest 2.1','runs the tests']]],
+  ['commands', [['npm run dev','runs the app on your computer while you work'],['npm run build','prepares the app for release'],['npm start','runs the prepared app (the Dockerfile uses this)'],['npm test','runs the tests (the deploy pipeline uses this)']]]
+];
+const TOOLS = [['tsconfig.json','TypeScript settings'],['tailwind.config.ts','styling settings'],['.eslintrc.json','code style rules']];
+const RUNS = {
+  browser:{label:'browser', about:'The visitor’s screen. It runs the home page, the add book page and BookCard, and loads cover images straight from Open Library.'},
+  server:{label:'server', file:'Dockerfile', about:'A Docker container on Fly.io. It runs your pages and the /api endpoints.',
+    steps:['starts from Node 20 on a small Linux image (Alpine)','works in the /app folder','installs the exact package versions','copies the app in','builds the app','listens on port 3000','starts it with npm start'], code:['Dockerfile','FROM',9]},
+  supabase:{label:'supabase', about:'Your database, login service, edge functions and schedules, hosted by Supabase.', settings:['url','anon','service']},
+  openlib:{label:'open library', about:'Free cover images. The browser loads them directly, so Open Library only sees the ISBNs of the covers being shown.'},
+  mail:{label:'mail service', about:'Receives the nightly cleanup summary. Its address is the MAIL_API_URL secret, which plainfold can’t read, so this link is inferred.', settings:['mail']}
+};
+const SETUP_VIEWS = [['runs','runs on'],['ships','ships with'],['settings','settings'],['built','built with'],['tools','developer tools']];
+
+/* ---------- state ---------- */
+const S = {view:'flow:home', exp:{}, open:{}, sel:null, code:false, confirmed:{}, hidden:{}, toast:''};
+try { if (localStorage.getItem('plainfold-theme') === 'dark') document.documentElement.dataset.theme = 'dark'; } catch (e) {}
+
+/* ---------- code ---------- */
+const CODE = {};
+const codeOf = f => CODE[f] || (CODE[f] = $('code-' + f).textContent.replace(/^\n/, '').replace(/\s+$/, '').split('\n'));
+function find(L, text, from = 0) { for (let i = from; i < L.length; i++) if (L[i].includes(text)) return i; console.warn('plainfold: not found', text); return from; }
+function ref([file, text, n = 1, after]) { const L = codeOf(file); const a = find(L, text, after ? find(L, after) : 0); return {file, a:a + 1, b:Math.min(L.length, a + n)}; }
+function partRange(d) { const L = codeOf(d.file); const s = find(L, d.range[0]); let e = s; for (let i = s + 1; i < L.length; i++) if (L[i].startsWith(d.range[1])) { e = i; break; } return {file:d.file, a:s + 1, b:e + 1}; }
+const TSKW = new Set('import from export default async await function const let return if else new type as null true false'.split(' '));
+const SQLKW = new Set('select from where as and or'.split(' '));
+function hl(line, file) {
+  const conf = !/\.(tsx?|sql)$/.test(file), sql = file.endsWith('.sql');
+  const re = /(\/\/.*$|^\s*#.*$|--.*$)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`)|(\$\{\{[^}]*\}\})|(\b\d+(?:\.\d+)*\b)|([A-Za-z_$][\w$]*)|(\s+)|([\s\S])/g;
+  let out = '', prev = '', m, first = true;
+  while ((m = re.exec(line))) {
+    if (m[1]) out += `<span class="c-cm">${esc(m[1])}</span>`;
+    else if (m[2]) out += `<span class="c-str">${esc(m[2])}</span>`;
+    else if (m[3]) out += `<span class="c-type">${esc(m[3])}</span>`;
+    else if (m[4]) out += `<span class="c-num">${m[4]}</span>`;
+    else if (m[5]) {
+      const id = m[5], rest = line.slice(re.lastIndex);
+      let cls;
+      if (conf) cls = /^\s*[:=]/.test(rest) ? 'c-prop' : /^[A-Z]+$/.test(id) && first ? 'c-kw' : 'c-var';
+      else if (sql) cls = SQLKW.has(id) ? 'c-kw' : /^\s*\(/.test(rest) ? 'c-fn' : 'c-var';
+      else { const call = /^\s*\(/.test(rest); cls = prev === '.' ? (call ? 'c-fn' : 'c-prop') : TSKW.has(id) ? 'c-kw' : call ? 'c-fn' : /^[A-Z]/.test(id) ? 'c-type' : 'c-var'; }
+      out += `<span class="${cls}">${esc(id)}</span>`;
+    } else if (m[6]) { out += m[6]; continue; }
+    else out += esc(m[7]);
+    prev = m[0].slice(-1); first = false;
+  }
+  return out;
+}
+function codeBlock({file, a, b}) {
+  const L = codeOf(file), from = Math.max(1, a - 1), to = Math.min(L.length, b + 1);
+  let h = '';
+  for (let i = from; i <= to; i++) h += `<div class="cl${i >= a && i <= b ? ' hl' : ''}"><span class="cn">${i}</span><span>${hl(L[i - 1], file) || ' '}</span></div>`;
+  return `<div class="cfile">${esc(file)} · ${a === b ? 'line ' + a : 'lines ' + a + '–' + b}</div><div class="code"><div class="code-in">${h}</div></div>`;
+}
+
+/* ---------- diagram layout ---------- */
+let COLW = 170;
+const LEFT = 40, TOPY = 76;
+function usedLeaves(flow) { const s = new Set(); (function w(items) { for (const it of items) { if (it.t === 'msg') { s.add(it.from); s.add(it.to); } else if (it.t === 'self') s.add(it.at); else if (it.items) w(it.items); } })(flow.items); return s; }
+function visible(flow) { const used = usedLeaves(flow), v = []; for (const id of flow.top) { const p = P[id]; if (p.group && S.exp[id]) v.push(...p.kids.filter(k => used.has(k))); else v.push(id); } return v; }
+function vis(id, v) { let c = id; while (c && !v.includes(c)) c = P[c].parent; return c; }
+const frameOpen = it => it.kind === 'loop' || !!S.open[it.id];
+function changedInside(id, flow) { const used = usedLeaves(flow); return P[id].group ? P[id].kids.some(k => used.has(k) && P[k].changed) : !!P[id].changed; }
+
+function layout(flow) {
+  const v = visible(flow), X = {};
+  const avail = $('center').clientWidth - 8;
+  COLW = Math.max(112, Math.min(210, (avail - LEFT - 100) / v.length));
+  v.forEach((p, i) => { X[p] = LEFT + i * COLW + COLW / 2; });
+  const rows = [], frames = [];
+  let y = TOPY + 48, n = 0;
+  const shows = it => !(it.onlyCollapsed && S.exp[it.onlyCollapsed]) && !S.hidden[it.id];
+  function cols(items) {
+    const c = new Set();
+    for (const it of items) {
+      if (!shows(it)) continue;
+      if (it.t === 'msg') { const a = vis(it.from, v), b = vis(it.to, v); if (a !== b) { c.add(a); c.add(b); } }
+      else if (it.t === 'self') c.add(vis(it.at, v));
+      else if (it.items) cols(it.items).forEach(x => c.add(x));
+    }
+    return [...c];
+  }
+  function walk(items) {
+    for (const it of items) {
+      if (!shows(it)) continue;
+      if (it.t === 'msg') {
+        const a = vis(it.from, v), b = vis(it.to, v);
+        if (a === b) continue;
+        rows.push({it, a, b, y, n:++n}); y += 46;
+      } else if (it.t === 'self') {
+        rows.push({it, a:vis(it.at, v), y, n:++n}); y += 52;
+      } else if (it.t === 'frame') {
+        const c = cols(it.items); if (!c.length) continue;
+        const xs = c.map(p => X[p]), x1 = Math.min(...xs) - 54, x2 = Math.max(...xs) + 54;
+        if (!frameOpen(it)) { frames.push({it, x1, x2, y:y - 6, closed:true}); y += 40; continue; }
+        const y1 = y - 20; y += 30;
+        walk(it.items);
+        frames.push({it, x1, x2, y1, y2:y - 22}); y += 12;
+      }
+    }
+  }
+  walk(flow.items);
+  return {v, X, rows, frames, w:LEFT + v.length * COLW + 100, h:y};
+}
+
+const MARKS = [['n','var(--fg-2)'],['f','var(--fg-3)'],['c','var(--chg)'],['s','var(--accent)']];
+const ARROWS = `<defs>${MARKS.map(([k, c]) => `<marker id="af-${k}" viewBox="0 0 8 8" refX="7.5" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8 z" style="fill:${c}"/></marker><marker id="ao-${k}" viewBox="0 0 8 8" refX="7.5" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0.5,0.5 L7.5,4 L0.5,7.5" style="fill:none;stroke:${c};stroke-width:1.2"/></marker>`).join('')}</defs>`;
+
+function drawFlow(flow) {
+  const {v, X, rows, frames, w, h} = layout(flow), used = usedLeaves(flow);
+  let s = `<svg class="seq" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img" aria-label="Sequence diagram: ${esc(flow.title)}">${ARROWS}`;
+  for (const g of flow.top) if (P[g].group && S.exp[g]) {
+    const kids = v.filter(k => P[k].parent === g); if (!kids.length) continue;
+    const x1 = X[kids[0]] - COLW / 2 + 16, x2 = X[kids[kids.length - 1]] + COLW / 2 - 16, mid = (x1 + x2) / 2;
+    s += `<g class="grp" data-act="toggle" data-id="${g}"><line x1="${x1}" y1="16" x2="${mid - 44}" y2="16"/><line x1="${mid + 44}" y1="16" x2="${x2}" y2="16"/><line x1="${x1}" y1="16" x2="${x1}" y2="22"/><line x1="${x2}" y1="16" x2="${x2}" y2="22"/>
+      <text x="${mid}" y="20" text-anchor="middle">${esc(P[g].label)} ▾</text><title>Close ${esc(P[g].label)}</title></g>`;
+  }
+  for (const p of v) s += `<line class="life" x1="${X[p]}" y1="${TOPY}" x2="${X[p]}" y2="${h - 8}"/>`;
+  for (const f of frames) {
+    const kind = f.it.kind === 'loop' ? 'loop' : f.it.kind === 'shared' ? 'shared' : 'if';
+    const chg = f.it.chg ? ' chg' : '', tabW = kind.length * 7 + 16;
+    if (f.closed) {
+      s += `<g class="fr tg closed${chg}" data-act="frame" data-id="${f.it.id}"><rect class="bx" x="${f.x1}" y="${f.y - 13}" width="${f.x2 - f.x1}" height="26" rx="4"/>
+        <text x="${f.x1 + 10}" y="${f.y + 4}">▸ <tspan class="kw">${kind}</tspan>  ${esc(f.it.label)}${f.it.chg ? ' · new' : ''}</text><title>Open: ${esc(f.it.label)}</title></g>`;
+    } else {
+      const tg = kind !== 'loop';
+      s += `<g class="fr${tg ? ' tg' : ''}${chg}"${tg ? ` data-act="frame" data-id="${f.it.id}"` : ''}><rect class="bx" x="${f.x1}" y="${f.y1}" width="${f.x2 - f.x1}" height="${f.y2 - f.y1}" rx="4"/>
+        <path class="tab" d="M${f.x1},${f.y1 + 4} a4,4 0 0 1 4,-4 h${tabW - 4} v12 l-6,6 h-${tabW - 6} z"/>
+        <text class="kw" x="${f.x1 + 7}" y="${f.y1 + 13}">${kind}</text><text x="${f.x1 + tabW + 8}" y="${f.y1 + 13}">${tg ? '▾ ' : ''}${esc(f.it.label)}</text></g>`;
+    }
+  }
+  for (const p of v) {
+    const d = P[p], sel = S.sel === 'p:' + p, sub = d.group ? `${d.kids.filter(k => used.has(k)).length} parts ▸` : (d.sub || d.file.split('/').pop());
+    const bw = COLW - 18, ch = changedInside(p, flow);
+    s += `<g class="pt${sel ? ' sel' : ''}${ch && !d.group ? ' chgd' : ''}" data-act="${d.group ? 'toggle' : 'part'}" data-id="${p}"><rect class="bx" x="${X[p] - bw / 2}" y="30" width="${bw}" height="46" rx="5"/>
+      <text class="lb" x="${X[p]}" y="49" text-anchor="middle" style="font-size:${Math.min(13, (bw - 14) / (d.label.length * 0.6)).toFixed(1)}px">${esc(d.label)}</text>
+      ${ch ? `<text class="dot" x="${X[p] + bw / 2 + 4}" y="37">●</text>` : ''}
+      <text class="sb${d.group ? ' more' : ''}" x="${X[p]}" y="66" text-anchor="middle">${esc(sub)}</text>
+      <title>${d.group ? 'Look inside ' + esc(d.label) : esc(d.label)}</title></g>`;
+  }
+  for (const r of rows) {
+    const it = r.it, sel = S.sel === it.id;
+    s += `<text class="num" x="6" y="${r.y + 4}">${r.n}</text>`;
+    if (it.t === 'msg') {
+      const x1 = X[r.a], x2 = X[r.b], dir = x2 > x1 ? 1 : -1, xa = x1 + dir * 4, xb = x2 - dir * 5;
+      const inf = it.inf && !S.confirmed[it.id], mk = sel ? 's' : it.chg ? 'c' : it.ret ? 'f' : 'n';
+      const tail = (it.risk ? ` <tspan class="rk">· ${esc(it.risk)}</tspan>` : '') + (S.confirmed[it.id] ? ` <tspan class="cf">✓ you</tspan>` : '');
+      s += `<g class="m${it.ret ? ' ret' : ''}${inf ? ' inf' : ''}${it.chg ? ' chg' : ''}${sel ? ' sel' : ''}" data-act="sel" data-id="${it.id}">
+        <line class="hit" x1="${xa}" y1="${r.y}" x2="${xb}" y2="${r.y}"/>
+        <line class="ln" x1="${xa}" y1="${r.y}" x2="${xb}" y2="${r.y}" marker-end="url(#${it.ret ? 'ao' : 'af'}-${mk})"/>
+        <text x="${(x1 + x2) / 2}" y="${r.y - 8}" text-anchor="middle">${esc(it.label)}${tail}</text></g>`;
+    } else {
+      const x = X[r.a];
+      s += `<g class="s${sel ? ' sel' : ''}" data-act="sel" data-id="${it.id}"><path class="hit" d="M${x},${r.y - 6} h36 v24 h-32"/>
+        <path class="ln" d="M${x + 3},${r.y - 6} h34 v22 h-30" marker-end="url(#af-${sel ? 's' : 'n'})"/><text x="${x + 46}" y="${r.y + 10}">${esc(it.label)}</text></g>`;
+    }
+  }
+  return s + '</svg>';
+}
+
+/* ---------- views ---------- */
+const view = () => { const [k, id] = S.view.split(':'); return {k, id}; };
+const hiddenCount = flow => { let h = 0; (function w(items) { for (const it of items) { if (S.hidden[it.id]) h++; if (it.items) w(it.items); } })(flow.items); return h; };
+
+function nav() {
+  const item = (key, label, tag = '', tagCls = '') => { const sel = S.view === key; return `<button type="button" class="ni${sel ? ' sel' : ''}" data-act="view" data-id="${key}"${sel ? ' aria-current="true"' : ''}><span class="mk">${sel ? '›' : ''}</span><span class="t">${esc(label)}</span><span class="tag ${tagCls}">${tag}</span></button>`; };
+  const changed = FLOWS.filter(f => f.changed), risky = FLOWS.filter(f => !f.changed && f.risk), rest = FLOWS.filter(f => !f.changed && !f.risk);
+  let h = `<div class="h"><span class="hs">#</span>flows</div>`;
+  if (changed.length) h += `<div class="h2">## changed</div>` + changed.map(f => item('flow:' + f.id, f.title + (f.shared ? ' · shared' : ''), '● ' + f.changed.replace(' ago', ''), 'chg')).join('');
+  if (risky.length) h += `<div class="h2">## writes or deletes data</div>` + risky.map(f => item('flow:' + f.id, f.title, f.risk.split(' ')[0], 'warn')).join('');
+  if (rest.length) h += `<div class="h2">## other</div>` + rest.map(f => item('flow:' + f.id, f.title)).join('');
+  h += `<div class="sp"></div><div class="h"><span class="hs">#</span>setup</div>` + SETUP_VIEWS.map(([v2, l]) => item('setup:' + v2, l, v2 === 'ships' ? '● 1 h' : '', 'chg')).join('');
+  h += `<p class="note">flows are ordered: changed first, then the ones that write or delete data, then the rest by screen.</p>`;
+  $('nav').innerHTML = h;
+}
+const LEGEND = `<div class="legend">
+  <span><svg width="34" height="8" aria-hidden="true"><line x1="0" y1="4" x2="28" y2="4" stroke="currentColor" stroke-width="1.3"/><path d="M26,0.5 L33,4 L26,7.5 z" fill="currentColor"/></svg>call</span>
+  <span><svg width="34" height="8" aria-hidden="true"><line x1="0" y1="4" x2="31" y2="4" stroke="currentColor" stroke-width="1"/><path d="M26,0.8 L32.5,4 L26,7.2" fill="none" stroke="currentColor"/></svg>answer</span>
+  <span><svg width="34" height="8" aria-hidden="true"><line x1="0" y1="4" x2="28" y2="4" stroke="currentColor" stroke-width="1.3" stroke-dasharray="5 4"/><path d="M26,0.5 L33,4 L26,7.5 z" fill="currentColor"/></svg>inferred</span>
+  <span class="tb"><button type="button" class="lk" data-act="expand-all">expand all</button><button type="button" class="lk" data-act="collapse-all">collapse all</button></span></div>`;
+function center() {
+  const {k, id} = view(), c = $('center');
+  if (k === 'flow') {
+    const f = FLOW[id], hid = hiddenCount(f);
+    c.innerHTML = `<h1 class="title"><span class="hs">##</span>${esc(f.title)}</h1>
+      <div class="meta"><span class="k">trigger</span>${esc(f.trigger)} · ${esc(f.entry)}</div>
+      <div class="meta"><span class="k">touches</span>${esc(f.touches)}</div>
+      ${f.usedBy ? `<div class="meta"><span class="k">used by</span>${f.usedBy.map(u => `<button type="button" class="lk" data-act="view" data-id="flow:${u}">${esc(FLOW[u].title)}</button>`).join(' · ')}</div>` : ''}
+      ${hid ? `<div class="meta"><span class="k">hidden</span>${hid} arrow${hid > 1 ? 's' : ''} you hid · <button type="button" class="lk" data-act="unhide">show again</button></div>` : ''}
+      ${LEGEND}${drawFlow(f)}`;
+    return;
+  }
+  let h = `<h1 class="title"><span class="hs">##</span>${esc(SETUP_VIEWS.find(x => x[0] === id)[1])}</h1>`;
+  if (id === 'runs') {
+    const node = (key, x, y, l1, subs, extra = '', w = 200) => { const sel = S.sel === 'r:' + key, gh = key === 'github';
+      return `<g class="nd${sel ? ' sel' : ''}${extra}" data-act="${gh ? 'view' : 'rsel'}" data-id="${gh ? 'setup:ships' : key}"><rect class="bx" x="${x - 14}" y="${y - 22}" width="${w}" height="${30 + subs.length * 18}" rx="6"/><text class="t1" x="${x}" y="${y}">${esc(l1)}</text>${subs.map(([cls, t], i) => `<text class="t2 ${cls}" x="${x}" y="${y + 20 + i * 18}">${esc(t)}</text>`).join('')}</g>`; };
+    h += `<div class="meta">where each part runs, read from the Dockerfile, the deploy pipeline, the Supabase folder and the settings</div>
+    <svg class="mapsvg" viewBox="0 0 900 380" role="img" aria-label="Where bookshelf runs">${ARROWS}
+      <path class="ed chg" d="M266,62 C330,62 372,100 394,144" marker-end="url(#af-c)"/><text class="el" x="300" y="56">deploys</text>
+      <path class="ed" d="M226,214 L342,214" marker-end="url(#af-f)"/><text class="el" x="284" y="206" text-anchor="middle">pages, /api</text>
+      <path class="ed" d="M566,186 C612,186 616,150 652,150" marker-end="url(#af-f)"/><text class="el" x="648" y="134" text-anchor="end">books, logins</text>
+      <path class="ed" d="M126,254 C126,330 250,332 342,332" marker-end="url(#af-f)"/><text class="el" x="232" y="322" text-anchor="middle">cover images</text>
+      <path class="ed inf" d="M760,174 L760,304" marker-end="url(#af-f)"/><text class="el" x="772" y="236">nightly summary</text><text class="el" x="772" y="252">inferred</text>
+      ${node('github', 40, 60, 'github actions', [['c2', 'deploy.yml · changed 1 h ago']], ' chg', 240)}
+      ${node('browser', 40, 210, 'browser', [['', 'home page, add book page'], ['', 'BookCard']])}
+      ${node('server', 360, 170, 'server', [['', 'docker container on fly.io'], ['', 'node 20 · port 3000'], ['lk2', 'from Dockerfile']], '', 220)}
+      ${node('supabase', 670, 130, 'supabase', [['', 'database · login'], ['', 'edge functions · scheduler']], '', 210)}
+      ${node('openlib', 360, 330, 'open library', [['', 'cover images']])}
+      ${node('mail', 670, 330, 'mail service', [['', 'from MAIL_API_URL']], '', 210)}
+    </svg>`;
+  } else if (id === 'ships') {
+    const sel = S.sel === 'k:trigger';
+    h += `<div class="meta">what happens when code is pushed to GitHub, read from .github/workflows/deploy.yml</div>
+      <button type="button" class="row trig ship${sel ? ' sel' : ''}" data-act="rsel" data-id="trigger"><span class="mk">${sel ? '›' : ''}</span><span class="f">→</span><span class="t">${esc(TRIGGER.t)}</span><span class="f chgc">● changed 1 h ago</span></button>
+      <div class="lines">${SHIP.map((x, i) => { const s2 = S.sel === 'k:' + x.id; return `<button type="button" class="row ship${s2 ? ' sel' : ''}" data-act="rsel" data-id="${x.id}"><span class="mk">${s2 ? '›' : ''}</span><span class="f">${i + 1}</span><span class="t">${esc(x.t)}</span><span class="f">${esc(x.f)}</span></button>`; }).join('')}</div>`;
+  } else if (id === 'settings') {
+    h += `<div class="meta">values the app reads from outside its code. the values themselves stay hidden.</div>
+      <div class="lines"><div class="thead set"><span></span><span>name</span><span>what it is</span><span>defined in</span><span>visibility</span></div>
+      ${SETTINGS.map(x => { const s2 = S.sel === 'e:' + x.id; return `<button type="button" class="row set${s2 ? ' sel' : ''}" data-act="rsel" data-id="${x.id}"><span class="mk">${s2 ? '›' : ''}</span><span class="t">${esc(x.name)}</span><span>${esc(x.what)}</span><span class="f">${esc(x.where)}</span><span class="${x.vis === 'public' ? 'vis-pub' : x.vis === 'secret' ? 'vis-sec' : ''}">${x.vis === 'public' ? 'visible in the browser' : x.vis === 'secret' ? 'secret' : esc(x.vis)}</span></button>`; }).join('')}</div>`;
+  } else if (id === 'built') {
+    h += `<div class="meta">libraries and commands, read from package.json</div>` + BUILT.map(([g, rows]) => `<div class="h2" style="margin-top:20px">## ${esc(g)}</div>${rows.map(([n, d]) => `<div class="row lib"><span></span><span class="t">${esc(n)}</span><span>${esc(d)}</span></div>`).join('')}`).join('');
+  } else {
+    h += `<div class="meta">these shape how code is written and checked. they don’t change what the app does, so plainfold keeps them out of the way.</div><div class="lines">${TOOLS.map(([n, d]) => `<div class="row lib"><span></span><span class="t">${esc(n)}</span><span>${esc(d)}</span></div>`).join('')}</div>`;
+  }
+  c.innerHTML = h;
+}
+
+/* ---------- details ---------- */
+const val = t => t.startsWith('!') ? `<div class="warn">${esc(t.slice(1))}</div>` : `<div>${esc(t)}</div>`;
+const showCode = refs => S.code ? refs.map(([lbl, r]) => (lbl ? `<div class="sec">${lbl}</div>` : '') + codeBlock(r)).join('') : `<div class="acts"><button type="button" class="lk" data-act="code">› show code${refs.length > 1 ? ' at both ends' : ''}</button></div>`;
+function usedIn(p) { return FLOWS.filter(f => { const l = usedLeaves(f); return P[p].group ? P[p].kids.some(k => l.has(k)) : l.has(p); }); }
+function settingsList(ids) {
+  return `<div class="sec">settings it uses</div>` + ids.map(id => { const x = SETTINGS.find(z => z.id === id); return `<div><button type="button" class="lk" data-act="gosetting" data-id="${id}">${esc(x.name)}</button> <span class="${x.vis === 'public' ? 'vis-pub' : 'vis-sec'}">${x.vis === 'public' ? 'visible in the browser' : 'secret'}</span></div>`; }).join('');
+}
+const changeBlock = (c, when) => `<div class="kv"><div class="k chgc">changed</div><div><span class="chgc">● by Claude · ${when}</span><br>${esc(c.text)}<span class="was">was: ${esc(c.was)}</span></div></div>`;
+function panel() {
+  const el = $('panel'), {k, id} = view();
+  if (k === 'setup') { setupPanel(el, id); return; }
+  const f = FLOW[id];
+  if (!S.sel) {
+    el.innerHTML = `<div class="pp"><h2><span class="hs">##</span>${esc(f.title)}</h2>
+      <p class="lead">${f.shared ? 'A shared part. Other flows show it as one folded line; this is what happens inside it.' : 'Each column is a part of the app. Arrows are messages between them, from top to bottom.'}</p>
+      ${f.changed ? changeBlock({text:'getCurrentUser now also treats people whose email isn’t confirmed as signed out.', was:'Only a missing token or a failed check meant signed out.'}, f.changed) + (f.id === 'home' ? `<div class="acts"><button type="button" class="lk" data-act="showme">› show me</button></div>` : '') : ''}
+      <div class="sec">how to read it</div>
+      <ul class="howto"><li>click a name at the top to look inside it</li><li>click an arrow to see what is sent and returned</li><li>lines starting with ▸ are folded paths; click to open</li><li>dashed arrows are inferred; the rest is read from the code</li></ul></div>`;
+    return;
+  }
+  if (S.sel.startsWith('p:')) {
+    const pid = S.sel.slice(2), d = P[pid];
+    const steps = d.steps ? `<div class="sec">what it does</div><ol class="steps">${d.steps.map(x => typeof x === 'string' ? `<li>${esc(x)}</li>` : `<li class="new">${esc(x.t)} · new</li>`).join('')}</ol>` : '';
+    el.innerHTML = `<div class="pp"><h2 class="${d.file ? 'code' : ''}"><span class="hs">##</span>${esc(d.label)}</h2><div class="route">${esc(d.file || d.sub || '')}</div>
+      <p class="lead">${esc(d.about)}</p>${d.changed ? changeBlock(CHG_GCU, '2 min ago') : ''}${steps}
+      <div class="sec">used in flows</div>${usedIn(pid).map(u => `<div><button type="button" class="lk" data-act="view" data-id="flow:${u.id}">${esc(u.title)}</button></div>`).join('')}
+      ${d.settings ? settingsList(d.settings) : ''}
+      ${d.file ? showCode([['', partRange(d)]]) : `<p class="lead">outside your code, so there is no code to open.</p>`}</div>`;
+    return;
+  }
+  const it = BY_ID[S.sel];
+  if (it.t === 'self') {
+    el.innerHTML = `<div class="pp"><h2><span class="hs">##</span>${esc(it.label)}</h2><div class="route">${esc(P[it.at].label)} · on its own</div><p class="lead">${esc(it.about)}</p>${showCode([['', ref(it.code)]])}</div>`;
+    return;
+  }
+  const inf = it.inf && !S.confirmed[it.id];
+  const kv = [[it.ret ? 'carries' : 'sends', it.sends], it.back && ['gets back', it.back], it.fails && ['if it fails', it.fails], it.note && ['note', it.note]].filter(Boolean);
+  const ends = [it.caller && ['sent from', ref(it.caller)], it.callee && ['received in', ref(it.callee)]].filter(Boolean);
+  const linkLine = it.link ? `<div class="kv"><div class="k">link</div><div>${S.confirmed[it.id] ? '<span class="ok">confirmed by you</span>' : esc(it.link)}</div></div>` : '';
+  const actions = it.inf ? `<div class="acts">${S.confirmed[it.id] ? `<button type="button" class="lk" data-act="unconfirm">undo confirm</button>` : `<button type="button" class="lk" data-act="confirm">confirm</button>`}<button type="button" class="lk" data-act="hide">hide this arrow</button><button type="button" class="lk" data-act="fix">fix with Claude</button>${S.toast ? `<span class="toast">${esc(S.toast)}</span>` : ''}</div>` : '';
+  el.innerHTML = `<div class="pp"><h2><span class="hs">##</span>${esc(it.label)}</h2><div class="route">${esc(P[it.from].label)} → ${esc(P[it.to].label)} · ${it.ret ? 'answer' : inf ? 'inferred call' : 'call'}</div>
+    ${it.change ? changeBlock(it.change, '2 min ago') : ''}
+    <div class="kv">${kv.map(([k2, t]) => `<div class="k">${k2}</div>${val(t)}`).join('')}</div>${linkLine}${actions}
+    ${ends.length ? showCode(ends) : ''}</div>`;
+}
+function setupPanel(el, id) {
+  const sel = S.sel || '';
+  if (sel.startsWith('r:')) {
+    const d = RUNS[sel.slice(2)];
+    el.innerHTML = `<div class="pp"><h2><span class="hs">##</span>${esc(d.label)}</h2><div class="route">${esc(d.file || 'where it runs')}</div><p class="lead">${esc(d.about)}</p>
+      ${d.steps ? `<div class="sec">what the Dockerfile does</div><ol class="steps">${d.steps.map(x => `<li>${esc(x)}</li>`).join('')}</ol>` : ''}
+      ${d.settings ? settingsList(d.settings) : ''}${d.code ? showCode([['', ref(d.code)]]) : ''}</div>`;
+    return;
+  }
+  if (sel.startsWith('k:')) {
+    const x = sel === 'k:trigger' ? TRIGGER : SHIP.find(z => z.id === sel.slice(2));
+    el.innerHTML = `<div class="pp"><h2><span class="hs">##</span>${esc(x.t)}</h2><div class="route">deploy pipeline</div><p class="lead">${esc(x.about)}</p>
+      ${x.chg ? changeBlock(x.chg, '1 h ago') : ''}${showCode([['', {file:'.github/workflows/deploy.yml', a:x.lines[0], b:x.lines[1]}]])}</div>`;
+    return;
+  }
+  if (sel.startsWith('e:')) {
+    const x = SETTINGS.find(z => z.id === sel.slice(2));
+    el.innerHTML = `<div class="pp"><h2 class="code"><span class="hs">##</span>${esc(x.name)}</h2><div class="route">setting</div><p class="lead">${esc(x.what)}</p>
+      <div class="kv"><div class="k">defined in</div><div>${esc(x.where)}</div><div class="k">used by</div><div>${esc(x.used)}</div>
+      <div class="k">visibility</div><div class="${x.vis === 'public' ? 'vis-pub' : x.vis === 'secret' ? 'vis-sec' : ''}">${x.vis === 'public' ? 'visible in the browser' : x.vis === 'secret' ? 'secret' : esc(x.vis)}</div>
+      <div class="k">note</div><div>${esc(x.note)}</div></div>${showCode([['', ref(x.code)]])}</div>`;
+    return;
+  }
+  const intro = {runs:'Click a part to see what defines it. github actions opens the deploy pipeline.', ships:'Click a step to see what it does and the lines of the pipeline file behind it.',
+    settings:'Click a setting to see where it is defined and what uses it.', built:'Everything here comes from package.json.', tools:'Nothing here changes what people see or what the app stores.'}[id];
+  el.innerHTML = `<div class="pp"><h2><span class="hs">##</span>${esc(SETUP_VIEWS.find(x => x[0] === id)[1])}</h2><p class="lead">${esc(intro)}</p>
+    ${id === 'ships' ? changeBlock(TRIGGER.chg, '1 h ago') + `<div class="acts"><button type="button" class="lk" data-act="rsel" data-id="trigger">› show me</button></div>` : ''}
+    ${id === 'built' ? showCode([['', {file:'package.json', a:1, b:21}]]) : ''}</div>`;
+}
+function top() {
+  const dark = document.documentElement.dataset.theme === 'dark';
+  $('topr').innerHTML = `<span class="ok">● in sync</span><button type="button" class="chgc" data-act="showme">● getCurrentUser changed · 2 min</button><button type="button" class="chgc" data-act="view" data-id="setup:ships">● deploy pipeline changed · 1 h</button><button type="button" class="lk" data-act="theme">${dark ? 'light' : 'dark'}</button>`;
+  $('foot').innerHTML = `<span>english by gemini 2.5 flash-lite · hosted</span><span>reads code only, never comments</span><span>esc closes details</span>`;
+}
+function render() { nav(); top(); center(); panel(); }
+
+/* ---------- events ---------- */
+document.addEventListener('click', e => {
+  const a = e.target.closest('[data-act]'); if (!a) return;
+  const id = a.dataset.id, vid = view().id;
+  switch (a.dataset.act) {
+    case 'view': if (S.view !== id) { S.view = id; S.sel = null; S.code = false; S.toast = ''; } break;
+    case 'toggle': S.exp[id] = !S.exp[id]; if (S.sel && S.sel.startsWith('p:') && P[S.sel.slice(2)].parent === id) S.sel = null; break;
+    case 'part': S.sel = S.sel === 'p:' + id ? null : 'p:' + id; S.code = false; S.toast = ''; break;
+    case 'sel': S.sel = S.sel === id ? null : id; S.code = false; S.toast = ''; break;
+    case 'frame': S.open[id] = !S.open[id]; break;
+    case 'code': S.code = !S.code; break;
+    case 'showme': S.view = 'flow:home'; S.exp.server = true; S.sel = 'h4'; S.code = false; break;
+    case 'expand-all': for (const g of FLOW[vid].top) if (P[g].group) S.exp[g] = true; (function w(items) { for (const it of items) if (it.t === 'frame') { S.open[it.id] = true; w(it.items); } })(FLOW[vid].items); break;
+    case 'collapse-all': S.exp = {}; S.open = {}; S.sel = null; break;
+    case 'rsel': { const pre = vid === 'runs' ? 'r:' : vid === 'ships' ? 'k:' : 'e:'; S.sel = S.sel === pre + id ? null : pre + id; S.code = false; break; }
+    case 'gosetting': S.view = 'setup:settings'; S.sel = 'e:' + id; S.code = false; break;
+    case 'confirm': S.confirmed[S.sel] = true; S.toast = ''; break;
+    case 'unconfirm': delete S.confirmed[S.sel]; break;
+    case 'hide': S.hidden[S.sel] = true; S.sel = null; break;
+    case 'unhide': S.hidden = {}; break;
+    case 'fix': {
+      const text = BY_ID[S.sel].fix;
+      const fail = () => { S.toast = 'copy didn’t work. the request: ' + text; panel(); };
+      try { navigator.clipboard.writeText(text).then(() => { S.toast = 'copied. paste it into Claude Code'; panel(); }, fail); } catch (err) { fail(); }
+      return;
+    }
+    case 'theme': {
+      const dark = document.documentElement.dataset.theme !== 'dark';
+      if (dark) document.documentElement.dataset.theme = 'dark'; else delete document.documentElement.dataset.theme;
+      try { localStorage.setItem('plainfold-theme', dark ? 'dark' : 'light'); } catch (err) {}
+      break;
+    }
+    default: return;
+  }
+  render();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && S.sel) { S.sel = null; S.code = false; render(); } });
+window.addEventListener('resize', () => { if (view().k === 'flow') center(); });
+render();
+})();
+</script>

@@ -1,0 +1,14 @@
+{
+  "name": "plainfold-universal-spike",
+  "private": true,
+  "type": "module",
+  "description": "Throwaway spike: one language-neutral walker on tree-sitter, calls resolved through LSP. Measured against the TypeScript-compiler skeleton.",
+  "dependencies": {
+    "pyright": "^1.1.414",
+    "tree-sitter-python": "^0.25.0",
+    "tree-sitter-typescript": "^0.23.2",
+    "typescript": "^7.0.2",
+    "typescript-language-server": "^6.0.1",
+    "web-tree-sitter": "^0.27.0"
+  }
+}

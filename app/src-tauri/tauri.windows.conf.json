@@ -1,0 +1,17 @@
+{
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "plainfold",
+        "width": 800,
+        "height": 480,
+        "resizable": false,
+        "maximizable": false,
+        "center": true,
+        "decorations": false,
+        "shadow": true
+      }
+    ]
+  }
+}

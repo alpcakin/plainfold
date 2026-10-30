@@ -1,0 +1,2808 @@
+{
+  "name": "bookshelf",
+  "stories": [
+    {
+      "id": "open:/books/new",
+      "title": "NewBookPage opens",
+      "trigger": {
+        "kind": "screen-open",
+        "route": "/books/new",
+        "ref": {
+          "file": "app/books/new/page.tsx",
+          "from": 5,
+          "to": 34
+        },
+        "place": "browser"
+      },
+      "participants": [
+        {
+          "id": "app/books/new/page.tsx#NewBookPage",
+          "name": "NewBookPage",
+          "kind": "screen",
+          "group": "browser",
+          "sub": "/books/new · app/books/new/page.tsx",
+          "ref": {
+            "file": "app/books/new/page.tsx",
+            "from": 5,
+            "to": 34
+          }
+        }
+      ],
+      "items": [
+        {
+          "t": "self",
+          "id": "sa82868fd2850",
+          "at": "app/books/new/page.tsx#NewBookPage",
+          "kind": "state",
+          "label": "useState: error = \"\"",
+          "ref": {
+            "file": "app/books/new/page.tsx",
+            "from": 7,
+            "to": 7
+          }
+        },
+        {
+          "t": "self",
+          "id": "s9850f78fe251",
+          "at": "app/books/new/page.tsx#NewBookPage",
+          "kind": "local",
+          "label": "const router",
+          "detail": "const router = useRouter();",
+          "ref": {
+            "file": "app/books/new/page.tsx",
+            "from": 6,
+            "to": 6
+          }
+        },
+        {
+          "t": "self",
+          "id": "s01b709ff8256",
+          "at": "app/books/new/page.tsx#NewBookPage",
+          "kind": "render",
+          "label": "<form>",
+          "detail": "render 1",
+          "ref": {
+            "file": "app/books/new/page.tsx",
+            "from": 25,
+            "to": 33
+          }
+        }
+      ],
+      "signals": [],
+      "gaps": [],
+      "coverage": [
+        {
+          "fn": "NewBookPage",
+          "file": "app/books/new/page.tsx",
+          "total": 21,
+          "covered": 10,
+          "missing": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            18,
+            19,
+            20,
+            22
+          ]
+        }
+      ]
+    },
+    {
+      "id": "action:/books/new#save",
+      "title": "“Save” on NewBookPage",
+      "trigger": {
+        "kind": "user-action",
+        "route": "/books/new",
+        "ref": {
+          "file": "app/books/new/page.tsx",
+          "from": 26,
+          "to": 26
+        },
+        "event": "submit",
+        "control": "form",
+        "text": "Save",
+        "handler": "save",
+        "place": "browser"
+      },
+      "participants": [
+        {
+          "id": "app/books/new/page.tsx#NewBookPage",
+          "name": "NewBookPage",
+          "kind": "screen",
+          "group": "browser",
+          "sub": "/books/new · app/books/new/page.tsx",
+          "ref": {
+            "file": "app/books/new/page.tsx",
+            "from": 5,
+            "to": 34
+          }
+        },
+        {
+          "id": "app/page.tsx#HomePage",
+          "name": "HomePage",
+          "kind": "screen",
+          "group": "browser",
+          "sub": "/ · app/page.tsx",
+          "ref": {
+            "file": "app/page.tsx",
+            "from": 6,
+            "to": 26
+          }
+        },
+        {
+          "id": "POST /api/books",
+          "name": "POST /api/books",
+          "kind": "endpoint",
+          "group": "server",
+          "sub": "app/api/books/route.ts",
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 38,
+            "to": 65
+          }
+        },
+        {
+          "id": "lib/auth.ts#getCurrentUser",
+          "name": "getCurrentUser",
+          "kind": "function",
+          "group": "server",
+          "sub": "lib/auth.ts",
+          "ref": {
+            "file": "lib/auth.ts",
+            "from": 6,
+            "to": 15
+          }
+        },
+        {
+          "id": "auth",
+          "name": "Supabase Auth",
+          "kind": "auth",
+          "group": "supabase"
+        },
+        {
+          "id": "db",
+          "name": "database",
+          "kind": "database",
+          "group": "supabase",
+          "sub": "books"
+        }
+      ],
+      "items": [
+        {
+          "t": "self",
+          "id": "saa6d28b650fd",
+          "at": "app/books/new/page.tsx#NewBookPage",
+          "kind": "trigger",
+          "label": "submit <form action={save}> · “Save”",
+          "detail": "<form action={save} className=\"grid gap-3 p-8\">",
+          "ref": {
+            "file": "app/books/new/page.tsx",
+            "from": 26,
+            "to": 26
+          }
+        },
+        {
+          "t": "call",
+          "id": "s0aa7e8d297eb",
+          "from": "app/books/new/page.tsx#NewBookPage",
+          "to": "POST /api/books",
+          "label": "POST /api/books",
+          "detail": "fetch(\"/api/books\", { method: \"POST\", body: JSON.stringify({ title: form.get(\"title\"), author: form.get(\"author\"), isbn: form.get(\"isbn\") || null, }), })",
+          "link": {
+            "kind": "exact",
+            "how": "Next.js routing: /api/books → app/api/books/route.ts, export POST"
+          },
+          "ref": {
+            "file": "app/books/new/page.tsx",
+            "from": 10,
+            "to": 17
+          },
+          "target": {
+            "file": "app/api/books/route.ts",
+            "from": 38,
+            "to": 65
+          },
+          "body": [
+            {
+              "t": "call",
+              "id": "saf1022ce5d86",
+              "from": "POST /api/books",
+              "to": "lib/auth.ts#getCurrentUser",
+              "label": "getCurrentUser()",
+              "detail": "getCurrentUser()",
+              "link": {
+                "kind": "exact",
+                "how": "call resolved by typescript-language-server to lib/auth.ts:6"
+              },
+              "ref": {
+                "file": "app/api/books/route.ts",
+                "from": 39,
+                "to": 39
+              },
+              "target": {
+                "file": "lib/auth.ts",
+                "from": 6,
+                "to": 15
+              },
+              "body": [
+                {
+                  "t": "self",
+                  "id": "s3d5b999fc095",
+                  "at": "lib/auth.ts#getCurrentUser",
+                  "kind": "reads",
+                  "label": "cookies().get(\"sb-access-token\")",
+                  "detail": "reads the incoming request (next/headers)",
+                  "ref": {
+                    "file": "lib/auth.ts",
+                    "from": 7,
+                    "to": 7
+                  }
+                },
+                {
+                  "t": "frame",
+                  "id": "s87dd663c5f07",
+                  "kind": "alt",
+                  "label": "!token",
+                  "ref": {
+                    "file": "lib/auth.ts",
+                    "from": 8,
+                    "to": 8
+                  },
+                  "items": [
+                    {
+                      "t": "return",
+                      "id": "se9fc4994f423",
+                      "from": "lib/auth.ts#getCurrentUser",
+                      "to": "POST /api/books",
+                      "label": "null",
+                      "detail": "return null;",
+                      "ref": {
+                        "file": "lib/auth.ts",
+                        "from": 8,
+                        "to": 8
+                      },
+                      "early": true
+                    }
+                  ]
+                },
+                {
+                  "t": "call",
+                  "id": "s6309cd862dc6",
+                  "from": "lib/auth.ts#getCurrentUser",
+                  "to": "auth",
+                  "label": "auth.getUser(token)",
+                  "detail": "supabase.auth.getUser(token)",
+                  "link": {
+                    "kind": "exact",
+                    "how": "Supabase client from lib/db.ts:3, auth"
+                  },
+                  "ref": {
+                    "file": "lib/auth.ts",
+                    "from": 10,
+                    "to": 10
+                  },
+                  "into": "{ data, error }"
+                },
+                {
+                  "t": "return",
+                  "id": "sf2facae577b3",
+                  "from": "auth",
+                  "to": "lib/auth.ts#getCurrentUser",
+                  "label": "{ data, error }",
+                  "ref": {
+                    "file": "lib/auth.ts",
+                    "from": 10,
+                    "to": 10
+                  }
+                },
+                {
+                  "t": "frame",
+                  "id": "s7ed44d250c5e",
+                  "kind": "alt",
+                  "label": "error || !data.user",
+                  "ref": {
+                    "file": "lib/auth.ts",
+                    "from": 11,
+                    "to": 11
+                  },
+                  "items": [
+                    {
+                      "t": "return",
+                      "id": "s810c028e3d3a",
+                      "from": "lib/auth.ts#getCurrentUser",
+                      "to": "POST /api/books",
+                      "label": "null",
+                      "detail": "return null;",
+                      "ref": {
+                        "file": "lib/auth.ts",
+                        "from": 11,
+                        "to": 11
+                      },
+                      "early": true
+                    }
+                  ]
+                },
+                {
+                  "t": "frame",
+                  "id": "se963a874dd6b",
+                  "kind": "alt",
+                  "label": "!data.user.email_confirmed_at",
+                  "ref": {
+                    "file": "lib/auth.ts",
+                    "from": 12,
+                    "to": 12
+                  },
+                  "items": [
+                    {
+                      "t": "return",
+                      "id": "s133fc7dd09fe",
+                      "from": "lib/auth.ts#getCurrentUser",
+                      "to": "POST /api/books",
+                      "label": "null",
+                      "detail": "return null;",
+                      "ref": {
+                        "file": "lib/auth.ts",
+                        "from": 12,
+                        "to": 12
+                      },
+                      "early": true
+                    }
+                  ]
+                },
+                {
+                  "t": "return",
+                  "id": "sb8c9f9d66f26",
+                  "from": "lib/auth.ts#getCurrentUser",
+                  "to": "POST /api/books",
+                  "label": "{ id, email }",
+                  "detail": "return { id: data.user.id, email: data.user.email ?? \"\" };",
+                  "ref": {
+                    "file": "lib/auth.ts",
+                    "from": 14,
+                    "to": 14
+                  }
+                }
+              ],
+              "touches": [],
+              "into": "user"
+            },
+            {
+              "t": "frame",
+              "id": "sdef1a4fad217",
+              "kind": "alt",
+              "label": "!user",
+              "ref": {
+                "file": "app/api/books/route.ts",
+                "from": 40,
+                "to": 42
+              },
+              "items": [
+                {
+                  "t": "return",
+                  "id": "se2553cb5444b",
+                  "from": "POST /api/books",
+                  "to": "app/books/new/page.tsx#NewBookPage",
+                  "label": "401 { error: \"Not logged in\" }",
+                  "detail": "return NextResponse.json({ error: \"Not logged in\" }, { status: 401 });",
+                  "ref": {
+                    "file": "app/api/books/route.ts",
+                    "from": 41,
+                    "to": 41
+                  },
+                  "early": true
+                }
+              ]
+            },
+            {
+              "t": "self",
+              "id": "sa0a1e16dbd96",
+              "at": "POST /api/books",
+              "kind": "local",
+              "label": "const body",
+              "detail": "const body = await request.json();",
+              "ref": {
+                "file": "app/api/books/route.ts",
+                "from": 44,
+                "to": 44
+              }
+            },
+            {
+              "t": "frame",
+              "id": "s61288ae3aa39",
+              "kind": "alt",
+              "label": "!body.title || !body.author",
+              "ref": {
+                "file": "app/api/books/route.ts",
+                "from": 45,
+                "to": 47
+              },
+              "items": [
+                {
+                  "t": "return",
+                  "id": "s5a824ed34fd1",
+                  "from": "POST /api/books",
+                  "to": "app/books/new/page.tsx#NewBookPage",
+                  "label": "400 { error: \"Title and author are required\" }",
+                  "detail": "return NextResponse.json({ error: \"Title and author are required\" }, { status: 400 });",
+                  "ref": {
+                    "file": "app/api/books/route.ts",
+                    "from": 46,
+                    "to": 46
+                  },
+                  "early": true
+                }
+              ]
+            },
+            {
+              "t": "call",
+              "id": "s1306930faa3b",
+              "from": "POST /api/books",
+              "to": "db",
+              "label": "from(\"books\").insert({ title, author, isbn, owner_id })",
+              "detail": "supabase.from(\"books\").insert({ title: body.title, author: body.author, isbn: body.isbn ?? null, owner_id: user.id, }).select().single()",
+              "link": {
+                "kind": "exact",
+                "how": "Supabase client from lib/db.ts:3, table \"books\""
+              },
+              "effect": "writes",
+              "ref": {
+                "file": "app/api/books/route.ts",
+                "from": 49,
+                "to": 58
+              },
+              "table": "books",
+              "into": "{ data, error }"
+            },
+            {
+              "t": "return",
+              "id": "s96d501fb8be8",
+              "from": "db",
+              "to": "POST /api/books",
+              "label": "{ data, error }",
+              "ref": {
+                "file": "app/api/books/route.ts",
+                "from": 49,
+                "to": 58
+              }
+            },
+            {
+              "t": "frame",
+              "id": "sc57c4ff0a052",
+              "kind": "alt",
+              "label": "error",
+              "ref": {
+                "file": "app/api/books/route.ts",
+                "from": 60,
+                "to": 62
+              },
+              "items": [
+                {
+                  "t": "return",
+                  "id": "scd764a7b1f20",
+                  "from": "POST /api/books",
+                  "to": "app/books/new/page.tsx#NewBookPage",
+                  "label": "500 { error: error.message }",
+                  "detail": "return NextResponse.json({ error: error.message }, { status: 500 });",
+                  "ref": {
+                    "file": "app/api/books/route.ts",
+                    "from": 61,
+                    "to": 61
+                  },
+                  "early": true
+                }
+              ]
+            },
+            {
+              "t": "return",
+              "id": "s99a2c4ebdc0c",
+              "from": "POST /api/books",
+              "to": "app/books/new/page.tsx#NewBookPage",
+              "label": "201 { book: data }",
+              "detail": "return NextResponse.json({ book: data }, { status: 201 });",
+              "ref": {
+                "file": "app/api/books/route.ts",
+                "from": 64,
+                "to": 64
+              }
+            }
+          ],
+          "touches": [
+            "writes books"
+          ],
+          "into": "res"
+        },
+        {
+          "t": "frame",
+          "id": "s1953b3976df8",
+          "kind": "alt",
+          "label": "!res.ok",
+          "ref": {
+            "file": "app/books/new/page.tsx",
+            "from": 18,
+            "to": 21
+          },
+          "items": [
+            {
+              "t": "self",
+              "id": "sa1815fc4e49a",
+              "at": "app/books/new/page.tsx#NewBookPage",
+              "kind": "state",
+              "label": "setError((await res.json()).error)",
+              "detail": "changes the state \"error\", which renders the component again",
+              "ref": {
+                "file": "app/books/new/page.tsx",
+                "from": 19,
+                "to": 19
+              }
+            },
+            {
+              "t": "return",
+              "id": "s9f8e8e30d019",
+              "from": "app/books/new/page.tsx#NewBookPage",
+              "to": "app/books/new/page.tsx#NewBookPage",
+              "label": "return",
+              "detail": "return;",
+              "ref": {
+                "file": "app/books/new/page.tsx",
+                "from": 20,
+                "to": 20
+              },
+              "early": true
+            }
+          ]
+        },
+        {
+          "t": "call",
+          "id": "sa031c04bd7ec",
+          "from": "app/books/new/page.tsx#NewBookPage",
+          "to": "app/page.tsx#HomePage",
+          "label": "router.push(\"/\")",
+          "detail": "router.push(\"/\")",
+          "link": {
+            "kind": "exact",
+            "how": "Next.js routing: / → app/page.tsx"
+          },
+          "ref": {
+            "file": "app/books/new/page.tsx",
+            "from": 22,
+            "to": 22
+          },
+          "target": {
+            "file": "app/page.tsx",
+            "from": 6,
+            "to": 26
+          },
+          "opens": "/"
+        }
+      ],
+      "signals": [
+        {
+          "text": "fetch(\"/api/books\", { method: \"POST\", body }) has no catch: a network failure is not handled here",
+          "ref": {
+            "file": "app/books/new/page.tsx",
+            "from": 10,
+            "to": 17
+          }
+        }
+      ],
+      "gaps": [],
+      "coverage": [
+        {
+          "fn": "getCurrentUser",
+          "file": "lib/auth.ts",
+          "total": 6,
+          "covered": 6,
+          "missing": []
+        },
+        {
+          "fn": "POST /api/books",
+          "file": "app/api/books/route.ts",
+          "total": 18,
+          "covered": 18,
+          "missing": []
+        },
+        {
+          "fn": "save",
+          "file": "app/books/new/page.tsx",
+          "total": 10,
+          "covered": 10,
+          "missing": []
+        }
+      ]
+    },
+    {
+      "id": "open:/",
+      "title": "HomePage opens",
+      "trigger": {
+        "kind": "screen-open",
+        "route": "/",
+        "ref": {
+          "file": "app/page.tsx",
+          "from": 6,
+          "to": 26
+        },
+        "place": "browser"
+      },
+      "participants": [
+        {
+          "id": "app/page.tsx#HomePage",
+          "name": "HomePage",
+          "kind": "screen",
+          "group": "browser",
+          "sub": "/ · app/page.tsx",
+          "ref": {
+            "file": "app/page.tsx",
+            "from": 6,
+            "to": 26
+          }
+        },
+        {
+          "id": "components/BookCard.tsx#BookCard",
+          "name": "BookCard",
+          "kind": "component",
+          "group": "browser",
+          "sub": "components/BookCard.tsx",
+          "ref": {
+            "file": "components/BookCard.tsx",
+            "from": 4,
+            "to": 16
+          }
+        },
+        {
+          "id": "GET /api/books",
+          "name": "GET /api/books",
+          "kind": "endpoint",
+          "group": "server",
+          "sub": "app/api/books/route.ts",
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 9,
+            "to": 36
+          }
+        },
+        {
+          "id": "lib/auth.ts#getCurrentUser",
+          "name": "getCurrentUser",
+          "kind": "function",
+          "group": "server",
+          "sub": "lib/auth.ts",
+          "ref": {
+            "file": "lib/auth.ts",
+            "from": 6,
+            "to": 15
+          }
+        },
+        {
+          "id": "lib/covers.ts#coverUrlFor",
+          "name": "coverUrlFor",
+          "kind": "function",
+          "group": "server",
+          "sub": "lib/covers.ts",
+          "ref": {
+            "file": "lib/covers.ts",
+            "from": 3,
+            "to": 8
+          }
+        },
+        {
+          "id": "auth",
+          "name": "Supabase Auth",
+          "kind": "auth",
+          "group": "supabase"
+        },
+        {
+          "id": "db",
+          "name": "database",
+          "kind": "database",
+          "group": "supabase",
+          "sub": "books"
+        }
+      ],
+      "items": [
+        {
+          "t": "self",
+          "id": "s49649c8084e8",
+          "at": "app/page.tsx#HomePage",
+          "kind": "state",
+          "label": "useState: books = [], loading = true",
+          "ref": {
+            "file": "app/page.tsx",
+            "from": 7,
+            "to": 8
+          }
+        },
+        {
+          "t": "self",
+          "id": "s481b1695728e",
+          "at": "app/page.tsx#HomePage",
+          "kind": "render",
+          "label": "<p>Loading your shelf…</p>",
+          "detail": "render 1 · loading is true",
+          "ref": {
+            "file": "app/page.tsx",
+            "from": 17,
+            "to": 17
+          }
+        },
+        {
+          "t": "frame",
+          "id": "se16fb691f331",
+          "kind": "effect",
+          "label": "useEffect(…, [])",
+          "note": "after first render",
+          "ref": {
+            "file": "app/page.tsx",
+            "from": 10,
+            "to": 15
+          },
+          "items": [
+            {
+              "t": "call",
+              "id": "s7fbe94170511",
+              "from": "app/page.tsx#HomePage",
+              "to": "GET /api/books",
+              "label": "GET /api/books?page=1",
+              "detail": "fetch(\"/api/books?page=1\")",
+              "link": {
+                "kind": "exact",
+                "how": "Next.js routing: /api/books → app/api/books/route.ts, export GET"
+              },
+              "ref": {
+                "file": "app/page.tsx",
+                "from": 11,
+                "to": 11
+              },
+              "target": {
+                "file": "app/api/books/route.ts",
+                "from": 9,
+                "to": 36
+              },
+              "body": [
+                {
+                  "t": "call",
+                  "id": "s9b1b79722e1c",
+                  "from": "GET /api/books",
+                  "to": "lib/auth.ts#getCurrentUser",
+                  "label": "getCurrentUser()",
+                  "detail": "getCurrentUser()",
+                  "link": {
+                    "kind": "exact",
+                    "how": "call resolved by typescript-language-server to lib/auth.ts:6"
+                  },
+                  "ref": {
+                    "file": "app/api/books/route.ts",
+                    "from": 10,
+                    "to": 10
+                  },
+                  "target": {
+                    "file": "lib/auth.ts",
+                    "from": 6,
+                    "to": 15
+                  },
+                  "body": [
+                    {
+                      "t": "self",
+                      "id": "s366cc346db9b",
+                      "at": "lib/auth.ts#getCurrentUser",
+                      "kind": "reads",
+                      "label": "cookies().get(\"sb-access-token\")",
+                      "detail": "reads the incoming request (next/headers)",
+                      "ref": {
+                        "file": "lib/auth.ts",
+                        "from": 7,
+                        "to": 7
+                      }
+                    },
+                    {
+                      "t": "frame",
+                      "id": "sd4243c37731d",
+                      "kind": "alt",
+                      "label": "!token",
+                      "ref": {
+                        "file": "lib/auth.ts",
+                        "from": 8,
+                        "to": 8
+                      },
+                      "items": [
+                        {
+                          "t": "return",
+                          "id": "s1e57e747aa33",
+                          "from": "lib/auth.ts#getCurrentUser",
+                          "to": "GET /api/books",
+                          "label": "null",
+                          "detail": "return null;",
+                          "ref": {
+                            "file": "lib/auth.ts",
+                            "from": 8,
+                            "to": 8
+                          },
+                          "early": true
+                        }
+                      ]
+                    },
+                    {
+                      "t": "call",
+                      "id": "s582fb42e9833",
+                      "from": "lib/auth.ts#getCurrentUser",
+                      "to": "auth",
+                      "label": "auth.getUser(token)",
+                      "detail": "supabase.auth.getUser(token)",
+                      "link": {
+                        "kind": "exact",
+                        "how": "Supabase client from lib/db.ts:3, auth"
+                      },
+                      "ref": {
+                        "file": "lib/auth.ts",
+                        "from": 10,
+                        "to": 10
+                      },
+                      "into": "{ data, error }"
+                    },
+                    {
+                      "t": "return",
+                      "id": "sd66fc636b2ed",
+                      "from": "auth",
+                      "to": "lib/auth.ts#getCurrentUser",
+                      "label": "{ data, error }",
+                      "ref": {
+                        "file": "lib/auth.ts",
+                        "from": 10,
+                        "to": 10
+                      }
+                    },
+                    {
+                      "t": "frame",
+                      "id": "s10f5707448dc",
+                      "kind": "alt",
+                      "label": "error || !data.user",
+                      "ref": {
+                        "file": "lib/auth.ts",
+                        "from": 11,
+                        "to": 11
+                      },
+                      "items": [
+                        {
+                          "t": "return",
+                          "id": "sf13076bb909b",
+                          "from": "lib/auth.ts#getCurrentUser",
+                          "to": "GET /api/books",
+                          "label": "null",
+                          "detail": "return null;",
+                          "ref": {
+                            "file": "lib/auth.ts",
+                            "from": 11,
+                            "to": 11
+                          },
+                          "early": true
+                        }
+                      ]
+                    },
+                    {
+                      "t": "frame",
+                      "id": "saae2d345e61f",
+                      "kind": "alt",
+                      "label": "!data.user.email_confirmed_at",
+                      "ref": {
+                        "file": "lib/auth.ts",
+                        "from": 12,
+                        "to": 12
+                      },
+                      "items": [
+                        {
+                          "t": "return",
+                          "id": "s024dd40e5200",
+                          "from": "lib/auth.ts#getCurrentUser",
+                          "to": "GET /api/books",
+                          "label": "null",
+                          "detail": "return null;",
+                          "ref": {
+                            "file": "lib/auth.ts",
+                            "from": 12,
+                            "to": 12
+                          },
+                          "early": true
+                        }
+                      ]
+                    },
+                    {
+                      "t": "return",
+                      "id": "s3592aaa69a7a",
+                      "from": "lib/auth.ts#getCurrentUser",
+                      "to": "GET /api/books",
+                      "label": "{ id, email }",
+                      "detail": "return { id: data.user.id, email: data.user.email ?? \"\" };",
+                      "ref": {
+                        "file": "lib/auth.ts",
+                        "from": 14,
+                        "to": 14
+                      }
+                    }
+                  ],
+                  "touches": [],
+                  "into": "user"
+                },
+                {
+                  "t": "frame",
+                  "id": "s47ffd62e7ff1",
+                  "kind": "alt",
+                  "label": "!user",
+                  "ref": {
+                    "file": "app/api/books/route.ts",
+                    "from": 11,
+                    "to": 13
+                  },
+                  "items": [
+                    {
+                      "t": "return",
+                      "id": "s9e981ce79484",
+                      "from": "GET /api/books",
+                      "to": "app/page.tsx#HomePage",
+                      "label": "401 { error: \"Not logged in\" }",
+                      "detail": "return NextResponse.json({ error: \"Not logged in\" }, { status: 401 });",
+                      "ref": {
+                        "file": "app/api/books/route.ts",
+                        "from": 12,
+                        "to": 12
+                      },
+                      "early": true
+                    }
+                  ]
+                },
+                {
+                  "t": "self",
+                  "id": "sdc3ccaa88bab",
+                  "at": "GET /api/books",
+                  "kind": "local",
+                  "label": "const url, page, from",
+                  "detail": "const url = new URL(request.url);\nconst page = Number(url.searchParams.get(\"page\") ?? \"1\");\nconst from = (page - 1) * PAGE_SIZE;",
+                  "ref": {
+                    "file": "app/api/books/route.ts",
+                    "from": 15,
+                    "to": 17
+                  }
+                },
+                {
+                  "t": "call",
+                  "id": "s6875b5ad1c1c",
+                  "from": "GET /api/books",
+                  "to": "db",
+                  "label": "from(\"books\").select(\"*\") …",
+                  "detail": "supabase.from(\"books\").select(\"*\").eq(\"owner_id\", user.id).order(\"created_at\", { ascending: false }).range(from, from + PAGE_SIZE - 1)",
+                  "link": {
+                    "kind": "exact",
+                    "how": "Supabase client from lib/db.ts:3, table \"books\""
+                  },
+                  "effect": "reads",
+                  "ref": {
+                    "file": "app/api/books/route.ts",
+                    "from": 19,
+                    "to": 24
+                  },
+                  "table": "books",
+                  "into": "{ data, error }"
+                },
+                {
+                  "t": "return",
+                  "id": "sce3f521dde16",
+                  "from": "db",
+                  "to": "GET /api/books",
+                  "label": "{ data, error }",
+                  "ref": {
+                    "file": "app/api/books/route.ts",
+                    "from": 19,
+                    "to": 24
+                  }
+                },
+                {
+                  "t": "frame",
+                  "id": "s7680f205f866",
+                  "kind": "alt",
+                  "label": "error",
+                  "ref": {
+                    "file": "app/api/books/route.ts",
+                    "from": 26,
+                    "to": 28
+                  },
+                  "items": [
+                    {
+                      "t": "return",
+                      "id": "s66e58c4494e3",
+                      "from": "GET /api/books",
+                      "to": "app/page.tsx#HomePage",
+                      "label": "500 { error: error.message }",
+                      "detail": "return NextResponse.json({ error: error.message }, { status: 500 });",
+                      "ref": {
+                        "file": "app/api/books/route.ts",
+                        "from": 27,
+                        "to": 27
+                      },
+                      "early": true
+                    }
+                  ]
+                },
+                {
+                  "t": "frame",
+                  "id": "sdde23c485526",
+                  "kind": "loop",
+                  "label": "data.map(book)",
+                  "ref": {
+                    "file": "app/api/books/route.ts",
+                    "from": 30,
+                    "to": 33
+                  },
+                  "items": [
+                    {
+                      "t": "call",
+                      "id": "sc7de1d73e7c0",
+                      "from": "GET /api/books",
+                      "to": "lib/covers.ts#coverUrlFor",
+                      "label": "coverUrlFor(book.isbn)",
+                      "detail": "coverUrlFor(book.isbn)",
+                      "link": {
+                        "kind": "exact",
+                        "how": "call resolved by typescript-language-server to lib/covers.ts:3"
+                      },
+                      "ref": {
+                        "file": "app/api/books/route.ts",
+                        "from": 32,
+                        "to": 32
+                      },
+                      "target": {
+                        "file": "lib/covers.ts",
+                        "from": 3,
+                        "to": 8
+                      }
+                    },
+                    {
+                      "t": "return",
+                      "id": "s7acccd838c7b",
+                      "from": "lib/covers.ts#coverUrlFor",
+                      "to": "GET /api/books",
+                      "label": "string | null",
+                      "detail": "return type, as typescript-language-server shows it",
+                      "ref": {
+                        "file": "lib/covers.ts",
+                        "from": 3,
+                        "to": 8
+                      }
+                    }
+                  ]
+                },
+                {
+                  "t": "return",
+                  "id": "se74bcaa6f7c3",
+                  "from": "GET /api/books",
+                  "to": "app/page.tsx#HomePage",
+                  "label": "200 { books, page }",
+                  "detail": "return NextResponse.json({ books, page });",
+                  "ref": {
+                    "file": "app/api/books/route.ts",
+                    "from": 35,
+                    "to": 35
+                  }
+                }
+              ],
+              "touches": [
+                "reads books"
+              ]
+            },
+            {
+              "t": "self",
+              "id": "sbfc1de412018",
+              "at": "app/page.tsx#HomePage",
+              "kind": "local",
+              "label": "res.json()",
+              "detail": "(res) => res.json()",
+              "ref": {
+                "file": "app/page.tsx",
+                "from": 12,
+                "to": 12
+              }
+            },
+            {
+              "t": "self",
+              "id": "s14c881d6e7be",
+              "at": "app/page.tsx#HomePage",
+              "kind": "state",
+              "label": "setBooks(json.books ?? [])",
+              "detail": "changes the state \"books\", which renders the component again",
+              "ref": {
+                "file": "app/page.tsx",
+                "from": 13,
+                "to": 13
+              }
+            },
+            {
+              "t": "self",
+              "id": "sc9c7a8add457",
+              "at": "app/page.tsx#HomePage",
+              "kind": "state",
+              "label": "setLoading(false)",
+              "detail": "changes the state \"loading\", which renders the component again",
+              "ref": {
+                "file": "app/page.tsx",
+                "from": 14,
+                "to": 14
+              }
+            }
+          ]
+        },
+        {
+          "t": "self",
+          "id": "s425f4027a31f",
+          "at": "app/page.tsx#HomePage",
+          "kind": "render",
+          "label": "<main>",
+          "detail": "render 2 · loading is false",
+          "ref": {
+            "file": "app/page.tsx",
+            "from": 19,
+            "to": 25
+          }
+        },
+        {
+          "t": "frame",
+          "id": "s852e436aaef4",
+          "kind": "loop",
+          "label": "books.map(book)",
+          "ref": {
+            "file": "app/page.tsx",
+            "from": 21,
+            "to": 23
+          },
+          "items": [
+            {
+              "t": "call",
+              "id": "s948be353a0e0",
+              "from": "app/page.tsx#HomePage",
+              "to": "components/BookCard.tsx#BookCard",
+              "label": "<BookCard book={book} />",
+              "detail": "<BookCard key={book.id} book={book} />",
+              "link": {
+                "kind": "exact",
+                "how": "JSX element resolved by typescript-language-server to components/BookCard.tsx:4"
+              },
+              "ref": {
+                "file": "app/page.tsx",
+                "from": 22,
+                "to": 22
+              },
+              "target": {
+                "file": "components/BookCard.tsx",
+                "from": 4,
+                "to": 16
+              }
+            }
+          ]
+        }
+      ],
+      "signals": [
+        {
+          "text": "fetch(\"/api/books?page=1\") never reads res.ok or res.status and has no catch: error answers (401, 500) and network failures are handled like success",
+          "ref": {
+            "file": "app/page.tsx",
+            "from": 11,
+            "to": 11
+          }
+        },
+        {
+          "text": "<Link href={`/books/${book.id}`}> goes to /books/{…}, but no page in app/ answers that URL",
+          "ref": {
+            "file": "components/BookCard.tsx",
+            "from": 6,
+            "to": 6
+          }
+        }
+      ],
+      "gaps": [
+        {
+          "text": "<img src={book.coverUrl}>: the browser loads a picture from an address only known at runtime",
+          "ref": {
+            "file": "components/BookCard.tsx",
+            "from": 8,
+            "to": 8
+          }
+        }
+      ],
+      "coverage": [
+        {
+          "fn": "HomePage",
+          "file": "app/page.tsx",
+          "total": 14,
+          "covered": 13,
+          "missing": [
+            15
+          ]
+        },
+        {
+          "fn": "getCurrentUser",
+          "file": "lib/auth.ts",
+          "total": 6,
+          "covered": 6,
+          "missing": []
+        },
+        {
+          "fn": "GET /api/books",
+          "file": "app/api/books/route.ts",
+          "total": 18,
+          "covered": 17,
+          "missing": [
+            31
+          ]
+        }
+      ]
+    },
+    {
+      "id": "endpoint:GET /api/books",
+      "title": "GET /api/books",
+      "trigger": {
+        "kind": "endpoint",
+        "route": "app/api/books/route.ts",
+        "ref": {
+          "file": "app/api/books/route.ts",
+          "from": 9,
+          "to": 36
+        },
+        "handler": "GET",
+        "place": "server"
+      },
+      "participants": [
+        {
+          "id": "GET /api/books",
+          "name": "GET /api/books",
+          "kind": "endpoint",
+          "group": "server",
+          "sub": "app/api/books/route.ts",
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 9,
+            "to": 36
+          }
+        },
+        {
+          "id": "lib/auth.ts#getCurrentUser",
+          "name": "getCurrentUser",
+          "kind": "function",
+          "group": "server",
+          "sub": "lib/auth.ts",
+          "ref": {
+            "file": "lib/auth.ts",
+            "from": 6,
+            "to": 15
+          }
+        },
+        {
+          "id": "lib/covers.ts#coverUrlFor",
+          "name": "coverUrlFor",
+          "kind": "function",
+          "group": "server",
+          "sub": "lib/covers.ts",
+          "ref": {
+            "file": "lib/covers.ts",
+            "from": 3,
+            "to": 8
+          }
+        },
+        {
+          "id": "auth",
+          "name": "Supabase Auth",
+          "kind": "auth",
+          "group": "supabase"
+        },
+        {
+          "id": "db",
+          "name": "database",
+          "kind": "database",
+          "group": "supabase",
+          "sub": "books"
+        }
+      ],
+      "items": [
+        {
+          "t": "call",
+          "id": "s1f25abf99f36",
+          "from": "GET /api/books",
+          "to": "lib/auth.ts#getCurrentUser",
+          "label": "getCurrentUser()",
+          "detail": "getCurrentUser()",
+          "link": {
+            "kind": "exact",
+            "how": "call resolved by typescript-language-server to lib/auth.ts:6"
+          },
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 10,
+            "to": 10
+          },
+          "target": {
+            "file": "lib/auth.ts",
+            "from": 6,
+            "to": 15
+          },
+          "body": [
+            {
+              "t": "self",
+              "id": "sca016b1c7b44",
+              "at": "lib/auth.ts#getCurrentUser",
+              "kind": "reads",
+              "label": "cookies().get(\"sb-access-token\")",
+              "detail": "reads the incoming request (next/headers)",
+              "ref": {
+                "file": "lib/auth.ts",
+                "from": 7,
+                "to": 7
+              }
+            },
+            {
+              "t": "frame",
+              "id": "s9f4dad95d372",
+              "kind": "alt",
+              "label": "!token",
+              "ref": {
+                "file": "lib/auth.ts",
+                "from": 8,
+                "to": 8
+              },
+              "items": [
+                {
+                  "t": "return",
+                  "id": "sc99d2a036757",
+                  "from": "lib/auth.ts#getCurrentUser",
+                  "to": "GET /api/books",
+                  "label": "null",
+                  "detail": "return null;",
+                  "ref": {
+                    "file": "lib/auth.ts",
+                    "from": 8,
+                    "to": 8
+                  },
+                  "early": true
+                }
+              ]
+            },
+            {
+              "t": "call",
+              "id": "s755e3e4407c9",
+              "from": "lib/auth.ts#getCurrentUser",
+              "to": "auth",
+              "label": "auth.getUser(token)",
+              "detail": "supabase.auth.getUser(token)",
+              "link": {
+                "kind": "exact",
+                "how": "Supabase client from lib/db.ts:3, auth"
+              },
+              "ref": {
+                "file": "lib/auth.ts",
+                "from": 10,
+                "to": 10
+              },
+              "into": "{ data, error }"
+            },
+            {
+              "t": "return",
+              "id": "s6a80f7bbf971",
+              "from": "auth",
+              "to": "lib/auth.ts#getCurrentUser",
+              "label": "{ data, error }",
+              "ref": {
+                "file": "lib/auth.ts",
+                "from": 10,
+                "to": 10
+              }
+            },
+            {
+              "t": "frame",
+              "id": "s41b2889aa549",
+              "kind": "alt",
+              "label": "error || !data.user",
+              "ref": {
+                "file": "lib/auth.ts",
+                "from": 11,
+                "to": 11
+              },
+              "items": [
+                {
+                  "t": "return",
+                  "id": "s43fc67161cae",
+                  "from": "lib/auth.ts#getCurrentUser",
+                  "to": "GET /api/books",
+                  "label": "null",
+                  "detail": "return null;",
+                  "ref": {
+                    "file": "lib/auth.ts",
+                    "from": 11,
+                    "to": 11
+                  },
+                  "early": true
+                }
+              ]
+            },
+            {
+              "t": "frame",
+              "id": "s7dbcb7473fe4",
+              "kind": "alt",
+              "label": "!data.user.email_confirmed_at",
+              "ref": {
+                "file": "lib/auth.ts",
+                "from": 12,
+                "to": 12
+              },
+              "items": [
+                {
+                  "t": "return",
+                  "id": "s6f456f5276dd",
+                  "from": "lib/auth.ts#getCurrentUser",
+                  "to": "GET /api/books",
+                  "label": "null",
+                  "detail": "return null;",
+                  "ref": {
+                    "file": "lib/auth.ts",
+                    "from": 12,
+                    "to": 12
+                  },
+                  "early": true
+                }
+              ]
+            },
+            {
+              "t": "return",
+              "id": "s1994c0da8084",
+              "from": "lib/auth.ts#getCurrentUser",
+              "to": "GET /api/books",
+              "label": "{ id, email }",
+              "detail": "return { id: data.user.id, email: data.user.email ?? \"\" };",
+              "ref": {
+                "file": "lib/auth.ts",
+                "from": 14,
+                "to": 14
+              }
+            }
+          ],
+          "touches": [],
+          "into": "user"
+        },
+        {
+          "t": "frame",
+          "id": "s0de1eec81336",
+          "kind": "alt",
+          "label": "!user",
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 11,
+            "to": 13
+          },
+          "items": [
+            {
+              "t": "return",
+              "id": "sffc3b99c63ef",
+              "from": "GET /api/books",
+              "to": "GET /api/books",
+              "label": "401 { error: \"Not logged in\" }",
+              "detail": "return NextResponse.json({ error: \"Not logged in\" }, { status: 401 });",
+              "ref": {
+                "file": "app/api/books/route.ts",
+                "from": 12,
+                "to": 12
+              },
+              "early": true
+            }
+          ]
+        },
+        {
+          "t": "self",
+          "id": "s06a81f28db43",
+          "at": "GET /api/books",
+          "kind": "local",
+          "label": "const url, page, from",
+          "detail": "const url = new URL(request.url);\nconst page = Number(url.searchParams.get(\"page\") ?? \"1\");\nconst from = (page - 1) * PAGE_SIZE;",
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 15,
+            "to": 17
+          }
+        },
+        {
+          "t": "call",
+          "id": "s14d23b2ff1fe",
+          "from": "GET /api/books",
+          "to": "db",
+          "label": "from(\"books\").select(\"*\") …",
+          "detail": "supabase.from(\"books\").select(\"*\").eq(\"owner_id\", user.id).order(\"created_at\", { ascending: false }).range(from, from + PAGE_SIZE - 1)",
+          "link": {
+            "kind": "exact",
+            "how": "Supabase client from lib/db.ts:3, table \"books\""
+          },
+          "effect": "reads",
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 19,
+            "to": 24
+          },
+          "table": "books",
+          "into": "{ data, error }"
+        },
+        {
+          "t": "return",
+          "id": "se9ca96950800",
+          "from": "db",
+          "to": "GET /api/books",
+          "label": "{ data, error }",
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 19,
+            "to": 24
+          }
+        },
+        {
+          "t": "frame",
+          "id": "s0439d5be23a1",
+          "kind": "alt",
+          "label": "error",
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 26,
+            "to": 28
+          },
+          "items": [
+            {
+              "t": "return",
+              "id": "sc2ef96dbbdbc",
+              "from": "GET /api/books",
+              "to": "GET /api/books",
+              "label": "500 { error: error.message }",
+              "detail": "return NextResponse.json({ error: error.message }, { status: 500 });",
+              "ref": {
+                "file": "app/api/books/route.ts",
+                "from": 27,
+                "to": 27
+              },
+              "early": true
+            }
+          ]
+        },
+        {
+          "t": "frame",
+          "id": "s7b4d7e252d3a",
+          "kind": "loop",
+          "label": "data.map(book)",
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 30,
+            "to": 33
+          },
+          "items": [
+            {
+              "t": "call",
+              "id": "s12a0bbe7ba57",
+              "from": "GET /api/books",
+              "to": "lib/covers.ts#coverUrlFor",
+              "label": "coverUrlFor(book.isbn)",
+              "detail": "coverUrlFor(book.isbn)",
+              "link": {
+                "kind": "exact",
+                "how": "call resolved by typescript-language-server to lib/covers.ts:3"
+              },
+              "ref": {
+                "file": "app/api/books/route.ts",
+                "from": 32,
+                "to": 32
+              },
+              "target": {
+                "file": "lib/covers.ts",
+                "from": 3,
+                "to": 8
+              }
+            },
+            {
+              "t": "return",
+              "id": "sd7c1e25880de",
+              "from": "lib/covers.ts#coverUrlFor",
+              "to": "GET /api/books",
+              "label": "string | null",
+              "detail": "return type, as typescript-language-server shows it",
+              "ref": {
+                "file": "lib/covers.ts",
+                "from": 3,
+                "to": 8
+              }
+            }
+          ]
+        },
+        {
+          "t": "return",
+          "id": "s3c987b547df1",
+          "from": "GET /api/books",
+          "to": "GET /api/books",
+          "label": "200 { books, page }",
+          "detail": "return NextResponse.json({ books, page });",
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 35,
+            "to": 35
+          }
+        }
+      ],
+      "signals": [],
+      "gaps": [],
+      "coverage": [
+        {
+          "fn": "GET",
+          "file": "app/api/books/route.ts",
+          "total": 18,
+          "covered": 17,
+          "missing": [
+            31
+          ]
+        },
+        {
+          "fn": "getCurrentUser",
+          "file": "lib/auth.ts",
+          "total": 6,
+          "covered": 6,
+          "missing": []
+        }
+      ]
+    },
+    {
+      "id": "endpoint:POST /api/books",
+      "title": "POST /api/books",
+      "trigger": {
+        "kind": "endpoint",
+        "route": "app/api/books/route.ts",
+        "ref": {
+          "file": "app/api/books/route.ts",
+          "from": 38,
+          "to": 65
+        },
+        "handler": "POST",
+        "place": "server"
+      },
+      "participants": [
+        {
+          "id": "POST /api/books",
+          "name": "POST /api/books",
+          "kind": "endpoint",
+          "group": "server",
+          "sub": "app/api/books/route.ts",
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 38,
+            "to": 65
+          }
+        },
+        {
+          "id": "lib/auth.ts#getCurrentUser",
+          "name": "getCurrentUser",
+          "kind": "function",
+          "group": "server",
+          "sub": "lib/auth.ts",
+          "ref": {
+            "file": "lib/auth.ts",
+            "from": 6,
+            "to": 15
+          }
+        },
+        {
+          "id": "auth",
+          "name": "Supabase Auth",
+          "kind": "auth",
+          "group": "supabase"
+        },
+        {
+          "id": "db",
+          "name": "database",
+          "kind": "database",
+          "group": "supabase",
+          "sub": "books"
+        }
+      ],
+      "items": [
+        {
+          "t": "call",
+          "id": "s52722b6e3bfc",
+          "from": "POST /api/books",
+          "to": "lib/auth.ts#getCurrentUser",
+          "label": "getCurrentUser()",
+          "detail": "getCurrentUser()",
+          "link": {
+            "kind": "exact",
+            "how": "call resolved by typescript-language-server to lib/auth.ts:6"
+          },
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 39,
+            "to": 39
+          },
+          "target": {
+            "file": "lib/auth.ts",
+            "from": 6,
+            "to": 15
+          },
+          "body": [
+            {
+              "t": "self",
+              "id": "s0a035ccad0f8",
+              "at": "lib/auth.ts#getCurrentUser",
+              "kind": "reads",
+              "label": "cookies().get(\"sb-access-token\")",
+              "detail": "reads the incoming request (next/headers)",
+              "ref": {
+                "file": "lib/auth.ts",
+                "from": 7,
+                "to": 7
+              }
+            },
+            {
+              "t": "frame",
+              "id": "s23f5533c7ad3",
+              "kind": "alt",
+              "label": "!token",
+              "ref": {
+                "file": "lib/auth.ts",
+                "from": 8,
+                "to": 8
+              },
+              "items": [
+                {
+                  "t": "return",
+                  "id": "s94fc457cc211",
+                  "from": "lib/auth.ts#getCurrentUser",
+                  "to": "POST /api/books",
+                  "label": "null",
+                  "detail": "return null;",
+                  "ref": {
+                    "file": "lib/auth.ts",
+                    "from": 8,
+                    "to": 8
+                  },
+                  "early": true
+                }
+              ]
+            },
+            {
+              "t": "call",
+              "id": "s8ad153ed4a3f",
+              "from": "lib/auth.ts#getCurrentUser",
+              "to": "auth",
+              "label": "auth.getUser(token)",
+              "detail": "supabase.auth.getUser(token)",
+              "link": {
+                "kind": "exact",
+                "how": "Supabase client from lib/db.ts:3, auth"
+              },
+              "ref": {
+                "file": "lib/auth.ts",
+                "from": 10,
+                "to": 10
+              },
+              "into": "{ data, error }"
+            },
+            {
+              "t": "return",
+              "id": "s6f3fce91d393",
+              "from": "auth",
+              "to": "lib/auth.ts#getCurrentUser",
+              "label": "{ data, error }",
+              "ref": {
+                "file": "lib/auth.ts",
+                "from": 10,
+                "to": 10
+              }
+            },
+            {
+              "t": "frame",
+              "id": "s23725e07dfe0",
+              "kind": "alt",
+              "label": "error || !data.user",
+              "ref": {
+                "file": "lib/auth.ts",
+                "from": 11,
+                "to": 11
+              },
+              "items": [
+                {
+                  "t": "return",
+                  "id": "s7ae7a114aeb3",
+                  "from": "lib/auth.ts#getCurrentUser",
+                  "to": "POST /api/books",
+                  "label": "null",
+                  "detail": "return null;",
+                  "ref": {
+                    "file": "lib/auth.ts",
+                    "from": 11,
+                    "to": 11
+                  },
+                  "early": true
+                }
+              ]
+            },
+            {
+              "t": "frame",
+              "id": "sfb7fe3b7d473",
+              "kind": "alt",
+              "label": "!data.user.email_confirmed_at",
+              "ref": {
+                "file": "lib/auth.ts",
+                "from": 12,
+                "to": 12
+              },
+              "items": [
+                {
+                  "t": "return",
+                  "id": "s2b2f02cbad3c",
+                  "from": "lib/auth.ts#getCurrentUser",
+                  "to": "POST /api/books",
+                  "label": "null",
+                  "detail": "return null;",
+                  "ref": {
+                    "file": "lib/auth.ts",
+                    "from": 12,
+                    "to": 12
+                  },
+                  "early": true
+                }
+              ]
+            },
+            {
+              "t": "return",
+              "id": "sae46a7577214",
+              "from": "lib/auth.ts#getCurrentUser",
+              "to": "POST /api/books",
+              "label": "{ id, email }",
+              "detail": "return { id: data.user.id, email: data.user.email ?? \"\" };",
+              "ref": {
+                "file": "lib/auth.ts",
+                "from": 14,
+                "to": 14
+              }
+            }
+          ],
+          "touches": [],
+          "into": "user"
+        },
+        {
+          "t": "frame",
+          "id": "s0de1eec81336",
+          "kind": "alt",
+          "label": "!user",
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 40,
+            "to": 42
+          },
+          "items": [
+            {
+              "t": "return",
+              "id": "s5b49e6c96156",
+              "from": "POST /api/books",
+              "to": "POST /api/books",
+              "label": "401 { error: \"Not logged in\" }",
+              "detail": "return NextResponse.json({ error: \"Not logged in\" }, { status: 401 });",
+              "ref": {
+                "file": "app/api/books/route.ts",
+                "from": 41,
+                "to": 41
+              },
+              "early": true
+            }
+          ]
+        },
+        {
+          "t": "self",
+          "id": "s2988e646810b",
+          "at": "POST /api/books",
+          "kind": "local",
+          "label": "const body",
+          "detail": "const body = await request.json();",
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 44,
+            "to": 44
+          }
+        },
+        {
+          "t": "frame",
+          "id": "s63614320ef87",
+          "kind": "alt",
+          "label": "!body.title || !body.author",
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 45,
+            "to": 47
+          },
+          "items": [
+            {
+              "t": "return",
+              "id": "s95b0dfd20fd0",
+              "from": "POST /api/books",
+              "to": "POST /api/books",
+              "label": "400 { error: \"Title and author are required\" }",
+              "detail": "return NextResponse.json({ error: \"Title and author are required\" }, { status: 400 });",
+              "ref": {
+                "file": "app/api/books/route.ts",
+                "from": 46,
+                "to": 46
+              },
+              "early": true
+            }
+          ]
+        },
+        {
+          "t": "call",
+          "id": "s7dc572560ac8",
+          "from": "POST /api/books",
+          "to": "db",
+          "label": "from(\"books\").insert({ title, author, isbn, owner_id })",
+          "detail": "supabase.from(\"books\").insert({ title: body.title, author: body.author, isbn: body.isbn ?? null, owner_id: user.id, }).select().single()",
+          "link": {
+            "kind": "exact",
+            "how": "Supabase client from lib/db.ts:3, table \"books\""
+          },
+          "effect": "writes",
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 49,
+            "to": 58
+          },
+          "table": "books",
+          "into": "{ data, error }"
+        },
+        {
+          "t": "return",
+          "id": "sb5651b097809",
+          "from": "db",
+          "to": "POST /api/books",
+          "label": "{ data, error }",
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 49,
+            "to": 58
+          }
+        },
+        {
+          "t": "frame",
+          "id": "s0439d5be23a1",
+          "kind": "alt",
+          "label": "error",
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 60,
+            "to": 62
+          },
+          "items": [
+            {
+              "t": "return",
+              "id": "s5e9f1a3f089e",
+              "from": "POST /api/books",
+              "to": "POST /api/books",
+              "label": "500 { error: error.message }",
+              "detail": "return NextResponse.json({ error: error.message }, { status: 500 });",
+              "ref": {
+                "file": "app/api/books/route.ts",
+                "from": 61,
+                "to": 61
+              },
+              "early": true
+            }
+          ]
+        },
+        {
+          "t": "return",
+          "id": "sa5cfd4918fc1",
+          "from": "POST /api/books",
+          "to": "POST /api/books",
+          "label": "201 { book: data }",
+          "detail": "return NextResponse.json({ book: data }, { status: 201 });",
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 64,
+            "to": 64
+          }
+        }
+      ],
+      "signals": [],
+      "gaps": [],
+      "coverage": [
+        {
+          "fn": "POST",
+          "file": "app/api/books/route.ts",
+          "total": 18,
+          "covered": 18,
+          "missing": []
+        },
+        {
+          "fn": "getCurrentUser",
+          "file": "lib/auth.ts",
+          "total": 6,
+          "covered": 6,
+          "missing": []
+        }
+      ]
+    },
+    {
+      "id": "function:supabase/functions/cleanup-deleted/index.ts#Deno.serve(…)",
+      "title": "Deno.serve(…) runs",
+      "trigger": {
+        "kind": "function",
+        "route": "supabase/functions/cleanup-deleted/index.ts",
+        "ref": {
+          "file": "supabase/functions/cleanup-deleted/index.ts",
+          "from": 3,
+          "to": 24
+        },
+        "how": "passed",
+        "by": "Deno.serve(…)",
+        "byRef": {
+          "file": "supabase/functions/cleanup-deleted/index.ts",
+          "from": 3,
+          "to": 24
+        }
+      },
+      "participants": [
+        {
+          "id": "supabase/functions/cleanup-deleted/index.ts#Deno.serve(…)",
+          "name": "Deno.serve(…)",
+          "kind": "function",
+          "group": "code",
+          "sub": "supabase/functions/cleanup-deleted/index.ts",
+          "ref": {
+            "file": "supabase/functions/cleanup-deleted/index.ts",
+            "from": 3,
+            "to": 24
+          }
+        },
+        {
+          "id": "db",
+          "name": "database",
+          "kind": "database",
+          "group": "supabase",
+          "sub": "books"
+        },
+        {
+          "id": "out:?",
+          "name": "unknown address",
+          "kind": "service",
+          "group": "outside"
+        }
+      ],
+      "items": [
+        {
+          "t": "self",
+          "id": "sfa11499ee768",
+          "at": "supabase/functions/cleanup-deleted/index.ts#Deno.serve(…)",
+          "kind": "local",
+          "label": "const supabase, cutoff",
+          "detail": "const supabase = createClient(Deno.env.get(\"SUPABASE_URL\")!, Deno.env.get(\"SUPABASE_SERVICE_ROLE_KEY\")!);\nconst cutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();",
+          "ref": {
+            "file": "supabase/functions/cleanup-deleted/index.ts",
+            "from": 4,
+            "to": 9
+          }
+        },
+        {
+          "t": "call",
+          "id": "s3e1630f7672b",
+          "from": "supabase/functions/cleanup-deleted/index.ts#Deno.serve(…)",
+          "to": "db",
+          "label": "from(\"books\").delete() …",
+          "detail": "supabase.from(\"books\").delete().lt(\"deleted_at\", cutoff).select(\"id\")",
+          "link": {
+            "kind": "exact",
+            "how": "Supabase client from supabase/functions/cleanup-deleted/index.ts:4, table \"books\""
+          },
+          "effect": "deletes",
+          "ref": {
+            "file": "supabase/functions/cleanup-deleted/index.ts",
+            "from": 10,
+            "to": 14
+          },
+          "table": "books",
+          "into": "{ data, error }"
+        },
+        {
+          "t": "return",
+          "id": "sbe38208a87a4",
+          "from": "db",
+          "to": "supabase/functions/cleanup-deleted/index.ts#Deno.serve(…)",
+          "label": "{ data, error }",
+          "ref": {
+            "file": "supabase/functions/cleanup-deleted/index.ts",
+            "from": 10,
+            "to": 14
+          }
+        },
+        {
+          "t": "frame",
+          "id": "s0439d5be23a1",
+          "kind": "alt",
+          "label": "error",
+          "ref": {
+            "file": "supabase/functions/cleanup-deleted/index.ts",
+            "from": 16,
+            "to": 16
+          },
+          "items": [
+            {
+              "t": "return",
+              "id": "sea871e53cb87",
+              "from": "supabase/functions/cleanup-deleted/index.ts#Deno.serve(…)",
+              "to": "supabase/functions/cleanup-deleted/index.ts#Deno.serve(…)",
+              "label": "new Response(error.message, { status: 5…",
+              "detail": "return new Response(error.message, { status: 500 });",
+              "ref": {
+                "file": "supabase/functions/cleanup-deleted/index.ts",
+                "from": 16,
+                "to": 16
+              },
+              "early": true
+            }
+          ]
+        },
+        {
+          "t": "call",
+          "id": "s4bf277c86108",
+          "from": "supabase/functions/cleanup-deleted/index.ts#Deno.serve(…)",
+          "to": "out:?",
+          "label": "POST …",
+          "detail": "fetch(Deno.env.get(\"MAIL_API_URL\")!, { method: \"POST\", body: JSON.stringify({ subject: \"Nightly cleanup\", removed: data.length }), })",
+          "link": {
+            "kind": "inferred",
+            "how": "address not known statically"
+          },
+          "ref": {
+            "file": "supabase/functions/cleanup-deleted/index.ts",
+            "from": 18,
+            "to": 21
+          },
+          "unused": true
+        },
+        {
+          "t": "self",
+          "id": "se17c1198f5dc",
+          "at": "supabase/functions/cleanup-deleted/index.ts#Deno.serve(…)",
+          "kind": "local",
+          "label": "return new Response(JSON.stringify({ re…",
+          "detail": "return new Response(JSON.stringify({ removed: data.length }));",
+          "ref": {
+            "file": "supabase/functions/cleanup-deleted/index.ts",
+            "from": 23,
+            "to": 23
+          }
+        }
+      ],
+      "signals": [],
+      "gaps": [
+        {
+          "text": "fetch(Deno.env.get(\"MAIL_API_URL\")!, { method: \"POST\", body: JSON.stringify({ subject: \"Nightly cleanup\", removed: data.length }), }): the address is only known at runtime",
+          "ref": {
+            "file": "supabase/functions/cleanup-deleted/index.ts",
+            "from": 18,
+            "to": 21
+          }
+        }
+      ],
+      "coverage": [
+        {
+          "fn": "anonymous",
+          "file": "supabase/functions/cleanup-deleted/index.ts",
+          "total": 14,
+          "covered": 14,
+          "missing": []
+        }
+      ]
+    }
+  ],
+  "index": [
+    {
+      "id": "GET /api/books",
+      "name": "GET /api/books",
+      "kind": "endpoint",
+      "group": "server",
+      "sub": "app/api/books/route.ts",
+      "ref": {
+        "file": "app/api/books/route.ts",
+        "from": 9,
+        "to": 36
+      },
+      "uses": [
+        {
+          "story": "action:/books/new#save",
+          "step": "sa031c04bd7ec",
+          "drawn": false,
+          "how": "calls",
+          "ref": {
+            "file": "app/page.tsx",
+            "from": 11,
+            "to": 11
+          },
+          "from": "app/page.tsx#HomePage"
+        },
+        {
+          "story": "open:/",
+          "step": "s7fbe94170511",
+          "drawn": true,
+          "how": "calls",
+          "ref": {
+            "file": "app/page.tsx",
+            "from": 11,
+            "to": 11
+          },
+          "from": "app/page.tsx#HomePage"
+        },
+        {
+          "story": "endpoint:GET /api/books",
+          "drawn": false,
+          "how": "starts",
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 9,
+            "to": 36
+          }
+        }
+      ]
+    },
+    {
+      "id": "POST /api/books",
+      "name": "POST /api/books",
+      "kind": "endpoint",
+      "group": "server",
+      "sub": "app/api/books/route.ts",
+      "ref": {
+        "file": "app/api/books/route.ts",
+        "from": 38,
+        "to": 65
+      },
+      "uses": [
+        {
+          "story": "action:/books/new#save",
+          "step": "s0aa7e8d297eb",
+          "drawn": true,
+          "how": "calls",
+          "ref": {
+            "file": "app/books/new/page.tsx",
+            "from": 10,
+            "to": 17
+          },
+          "from": "app/books/new/page.tsx#NewBookPage"
+        },
+        {
+          "story": "endpoint:POST /api/books",
+          "drawn": false,
+          "how": "starts",
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 38,
+            "to": 65
+          }
+        }
+      ]
+    },
+    {
+      "id": "app/books/new/page.tsx#NewBookPage",
+      "name": "NewBookPage",
+      "kind": "screen",
+      "group": "browser",
+      "sub": "/books/new · app/books/new/page.tsx",
+      "ref": {
+        "file": "app/books/new/page.tsx",
+        "from": 5,
+        "to": 34
+      },
+      "uses": [
+        {
+          "story": "open:/books/new",
+          "drawn": false,
+          "how": "starts",
+          "ref": {
+            "file": "app/books/new/page.tsx",
+            "from": 5,
+            "to": 34
+          }
+        }
+      ]
+    },
+    {
+      "id": "app/books/new/page.tsx#NewBookPage.save",
+      "name": "save",
+      "kind": "function",
+      "group": "browser",
+      "sub": "app/books/new/page.tsx",
+      "ref": {
+        "file": "app/books/new/page.tsx",
+        "from": 9,
+        "to": 23
+      },
+      "uses": [
+        {
+          "story": "action:/books/new#save",
+          "drawn": false,
+          "how": "starts",
+          "ref": {
+            "file": "app/books/new/page.tsx",
+            "from": 9,
+            "to": 23
+          }
+        }
+      ]
+    },
+    {
+      "id": "app/page.tsx#HomePage",
+      "name": "HomePage",
+      "kind": "screen",
+      "group": "browser",
+      "sub": "/ · app/page.tsx",
+      "ref": {
+        "file": "app/page.tsx",
+        "from": 6,
+        "to": 26
+      },
+      "uses": [
+        {
+          "story": "action:/books/new#save",
+          "step": "sa031c04bd7ec",
+          "drawn": true,
+          "how": "calls",
+          "ref": {
+            "file": "app/books/new/page.tsx",
+            "from": 22,
+            "to": 22
+          },
+          "from": "app/books/new/page.tsx#NewBookPage"
+        },
+        {
+          "story": "open:/",
+          "drawn": false,
+          "how": "starts",
+          "ref": {
+            "file": "app/page.tsx",
+            "from": 6,
+            "to": 26
+          }
+        }
+      ]
+    },
+    {
+      "id": "auth",
+      "name": "Supabase Auth",
+      "kind": "auth",
+      "group": "supabase",
+      "uses": [
+        {
+          "story": "action:/books/new#save",
+          "step": "s6309cd862dc6",
+          "drawn": true,
+          "how": "calls",
+          "ref": {
+            "file": "lib/auth.ts",
+            "from": 10,
+            "to": 10
+          },
+          "from": "lib/auth.ts#getCurrentUser"
+        },
+        {
+          "story": "open:/",
+          "step": "s582fb42e9833",
+          "drawn": true,
+          "how": "calls",
+          "ref": {
+            "file": "lib/auth.ts",
+            "from": 10,
+            "to": 10
+          },
+          "from": "lib/auth.ts#getCurrentUser"
+        },
+        {
+          "story": "endpoint:GET /api/books",
+          "step": "s755e3e4407c9",
+          "drawn": true,
+          "how": "calls",
+          "ref": {
+            "file": "lib/auth.ts",
+            "from": 10,
+            "to": 10
+          },
+          "from": "lib/auth.ts#getCurrentUser"
+        },
+        {
+          "story": "endpoint:POST /api/books",
+          "step": "s8ad153ed4a3f",
+          "drawn": true,
+          "how": "calls",
+          "ref": {
+            "file": "lib/auth.ts",
+            "from": 10,
+            "to": 10
+          },
+          "from": "lib/auth.ts#getCurrentUser"
+        }
+      ]
+    },
+    {
+      "id": "components/BookCard.tsx#BookCard",
+      "name": "BookCard",
+      "kind": "component",
+      "group": "browser",
+      "sub": "components/BookCard.tsx",
+      "ref": {
+        "file": "components/BookCard.tsx",
+        "from": 4,
+        "to": 16
+      },
+      "uses": [
+        {
+          "story": "action:/books/new#save",
+          "step": "sa031c04bd7ec",
+          "drawn": false,
+          "how": "calls",
+          "ref": {
+            "file": "app/page.tsx",
+            "from": 22,
+            "to": 22
+          },
+          "from": "app/page.tsx#HomePage"
+        },
+        {
+          "story": "open:/",
+          "step": "s948be353a0e0",
+          "drawn": true,
+          "how": "calls",
+          "ref": {
+            "file": "app/page.tsx",
+            "from": 22,
+            "to": 22
+          },
+          "from": "app/page.tsx#HomePage"
+        },
+        {
+          "story": "open:/",
+          "step": "s948be353a0e0",
+          "drawn": true,
+          "how": "draws",
+          "ref": {
+            "file": "app/page.tsx",
+            "from": 22,
+            "to": 22
+          },
+          "from": "app/page.tsx#HomePage"
+        }
+      ]
+    },
+    {
+      "id": "db",
+      "name": "database",
+      "kind": "database",
+      "group": "supabase",
+      "sub": "books",
+      "uses": [
+        {
+          "story": "action:/books/new#save",
+          "step": "s1306930faa3b",
+          "drawn": true,
+          "how": "writes",
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 49,
+            "to": 58
+          },
+          "from": "POST /api/books"
+        },
+        {
+          "story": "open:/",
+          "step": "s6875b5ad1c1c",
+          "drawn": true,
+          "how": "reads",
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 19,
+            "to": 24
+          },
+          "from": "GET /api/books"
+        },
+        {
+          "story": "endpoint:GET /api/books",
+          "step": "s14d23b2ff1fe",
+          "drawn": true,
+          "how": "reads",
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 19,
+            "to": 24
+          },
+          "from": "GET /api/books"
+        },
+        {
+          "story": "endpoint:POST /api/books",
+          "step": "s7dc572560ac8",
+          "drawn": true,
+          "how": "writes",
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 49,
+            "to": 58
+          },
+          "from": "POST /api/books"
+        },
+        {
+          "story": "function:supabase/functions/cleanup-deleted/index.ts#Deno.serve(…)",
+          "step": "s3e1630f7672b",
+          "drawn": true,
+          "how": "deletes",
+          "ref": {
+            "file": "supabase/functions/cleanup-deleted/index.ts",
+            "from": 10,
+            "to": 14
+          },
+          "from": "supabase/functions/cleanup-deleted/index.ts#Deno.serve(…)"
+        }
+      ]
+    },
+    {
+      "id": "db/books",
+      "name": "books",
+      "kind": "database",
+      "group": "supabase",
+      "sub": "database",
+      "in": "db",
+      "uses": [
+        {
+          "story": "action:/books/new#save",
+          "step": "s1306930faa3b",
+          "drawn": true,
+          "how": "writes",
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 49,
+            "to": 58
+          },
+          "from": "POST /api/books"
+        },
+        {
+          "story": "open:/",
+          "step": "s6875b5ad1c1c",
+          "drawn": true,
+          "how": "reads",
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 19,
+            "to": 24
+          },
+          "from": "GET /api/books"
+        },
+        {
+          "story": "endpoint:GET /api/books",
+          "step": "s14d23b2ff1fe",
+          "drawn": true,
+          "how": "reads",
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 19,
+            "to": 24
+          },
+          "from": "GET /api/books"
+        },
+        {
+          "story": "endpoint:POST /api/books",
+          "step": "s7dc572560ac8",
+          "drawn": true,
+          "how": "writes",
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 49,
+            "to": 58
+          },
+          "from": "POST /api/books"
+        },
+        {
+          "story": "function:supabase/functions/cleanup-deleted/index.ts#Deno.serve(…)",
+          "step": "s3e1630f7672b",
+          "drawn": true,
+          "how": "deletes",
+          "ref": {
+            "file": "supabase/functions/cleanup-deleted/index.ts",
+            "from": 10,
+            "to": 14
+          },
+          "from": "supabase/functions/cleanup-deleted/index.ts#Deno.serve(…)"
+        }
+      ]
+    },
+    {
+      "id": "lib/auth.ts#getCurrentUser",
+      "name": "getCurrentUser",
+      "kind": "function",
+      "group": "server",
+      "sub": "lib/auth.ts",
+      "ref": {
+        "file": "lib/auth.ts",
+        "from": 6,
+        "to": 15
+      },
+      "uses": [
+        {
+          "story": "action:/books/new#save",
+          "step": "saf1022ce5d86",
+          "drawn": true,
+          "how": "calls",
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 39,
+            "to": 39
+          },
+          "from": "POST /api/books"
+        },
+        {
+          "story": "open:/",
+          "step": "s9b1b79722e1c",
+          "drawn": true,
+          "how": "calls",
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 10,
+            "to": 10
+          },
+          "from": "GET /api/books"
+        },
+        {
+          "story": "endpoint:GET /api/books",
+          "step": "s1f25abf99f36",
+          "drawn": true,
+          "how": "calls",
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 10,
+            "to": 10
+          },
+          "from": "GET /api/books"
+        },
+        {
+          "story": "endpoint:POST /api/books",
+          "step": "s52722b6e3bfc",
+          "drawn": true,
+          "how": "calls",
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 39,
+            "to": 39
+          },
+          "from": "POST /api/books"
+        }
+      ]
+    },
+    {
+      "id": "lib/covers.ts#coverUrlFor",
+      "name": "coverUrlFor",
+      "kind": "function",
+      "group": "server",
+      "sub": "lib/covers.ts",
+      "ref": {
+        "file": "lib/covers.ts",
+        "from": 3,
+        "to": 8
+      },
+      "uses": [
+        {
+          "story": "action:/books/new#save",
+          "step": "sa031c04bd7ec",
+          "drawn": false,
+          "how": "calls",
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 32,
+            "to": 32
+          },
+          "from": "GET /api/books"
+        },
+        {
+          "story": "open:/",
+          "step": "sc7de1d73e7c0",
+          "drawn": true,
+          "how": "calls",
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 32,
+            "to": 32
+          },
+          "from": "GET /api/books"
+        },
+        {
+          "story": "endpoint:GET /api/books",
+          "step": "s12a0bbe7ba57",
+          "drawn": true,
+          "how": "calls",
+          "ref": {
+            "file": "app/api/books/route.ts",
+            "from": 32,
+            "to": 32
+          },
+          "from": "GET /api/books"
+        }
+      ]
+    },
+    {
+      "id": "out:?",
+      "name": "unknown address",
+      "kind": "service",
+      "group": "outside",
+      "uses": [
+        {
+          "story": "function:supabase/functions/cleanup-deleted/index.ts#Deno.serve(…)",
+          "step": "s4bf277c86108",
+          "drawn": true,
+          "how": "calls",
+          "ref": {
+            "file": "supabase/functions/cleanup-deleted/index.ts",
+            "from": 18,
+            "to": 21
+          },
+          "from": "supabase/functions/cleanup-deleted/index.ts#Deno.serve(…)"
+        }
+      ]
+    },
+    {
+      "id": "supabase/functions/cleanup-deleted/index.ts#Deno.serve(…)",
+      "name": "anonymous",
+      "kind": "function",
+      "group": "code",
+      "sub": "supabase/functions/cleanup-deleted/index.ts",
+      "ref": {
+        "file": "supabase/functions/cleanup-deleted/index.ts",
+        "from": 3,
+        "to": 24
+      },
+      "uses": [
+        {
+          "story": "function:supabase/functions/cleanup-deleted/index.ts#Deno.serve(…)",
+          "drawn": false,
+          "how": "starts",
+          "ref": {
+            "file": "supabase/functions/cleanup-deleted/index.ts",
+            "from": 3,
+            "to": 24
+          }
+        }
+      ]
+    }
+  ],
+  "files": {
+    "app/api/books/route.ts": "import { NextResponse } from \"next/server\";\nimport { getCurrentUser } from \"@/lib/auth\";\nimport { supabase } from \"@/lib/db\";\nimport { coverUrlFor } from \"@/lib/covers\";\nimport type { Book } from \"@/types/book\";\n\nconst PAGE_SIZE = 20;\n\nexport async function GET(request: Request) {\n  const user = await getCurrentUser();\n  if (!user) {\n    return NextResponse.json({ error: \"Not logged in\" }, { status: 401 });\n  }\n\n  const url = new URL(request.url);\n  const page = Number(url.searchParams.get(\"page\") ?? \"1\");\n  const from = (page - 1) * PAGE_SIZE;\n\n  const { data, error } = await supabase\n    .from(\"books\")\n    .select(\"*\")\n    .eq(\"owner_id\", user.id)\n    .order(\"created_at\", { ascending: false })\n    .range(from, from + PAGE_SIZE - 1);\n\n  if (error) {\n    return NextResponse.json({ error: error.message }, { status: 500 });\n  }\n\n  const books: Book[] = data.map((book) => ({\n    ...book,\n    coverUrl: coverUrlFor(book.isbn),\n  }));\n\n  return NextResponse.json({ books, page });\n}\n\nexport async function POST(request: Request) {\n  const user = await getCurrentUser();\n  if (!user) {\n    return NextResponse.json({ error: \"Not logged in\" }, { status: 401 });\n  }\n\n  const body = await request.json();\n  if (!body.title || !body.author) {\n    return NextResponse.json({ error: \"Title and author are required\" }, { status: 400 });\n  }\n\n  const { data, error } = await supabase\n    .from(\"books\")\n    .insert({\n      title: body.title,\n      author: body.author,\n      isbn: body.isbn ?? null,\n      owner_id: user.id,\n    })\n    .select()\n    .single();\n\n  if (error) {\n    return NextResponse.json({ error: error.message }, { status: 500 });\n  }\n\n  return NextResponse.json({ book: data }, { status: 201 });\n}\n",
+    "app/books/new/page.tsx": "\"use client\";\nimport { useState } from \"react\";\nimport { useRouter } from \"next/navigation\";\n\nexport default function NewBookPage() {\n  const router = useRouter();\n  const [error, setError] = useState(\"\");\n\n  async function save(form: FormData) {\n    const res = await fetch(\"/api/books\", {\n      method: \"POST\",\n      body: JSON.stringify({\n        title: form.get(\"title\"),\n        author: form.get(\"author\"),\n        isbn: form.get(\"isbn\") || null,\n      }),\n    });\n    if (!res.ok) {\n      setError((await res.json()).error);\n      return;\n    }\n    router.push(\"/\");\n  }\n\n  return (\n    <form action={save} className=\"grid gap-3 p-8\">\n      <input name=\"title\" placeholder=\"Title\" />\n      <input name=\"author\" placeholder=\"Author\" />\n      <input name=\"isbn\" placeholder=\"ISBN (optional)\" />\n      {error && <p className=\"text-red-600\">{error}</p>}\n      <button type=\"submit\">Save</button>\n    </form>\n  );\n}\n",
+    "app/page.tsx": "\"use client\";\nimport { useEffect, useState } from \"react\";\nimport { BookCard } from \"@/components/BookCard\";\nimport type { Book } from \"@/types/book\";\n\nexport default function HomePage() {\n  const [books, setBooks] = useState<Book[]>([]);\n  const [loading, setLoading] = useState(true);\n\n  useEffect(() => {\n    fetch(\"/api/books?page=1\")\n      .then((res) => res.json())\n      .then((json) => setBooks(json.books ?? []))\n      .finally(() => setLoading(false));\n  }, []);\n\n  if (loading) return <p className=\"p-8 text-neutral-500\">Loading your shelf…</p>;\n\n  return (\n    <main className=\"grid grid-cols-2 gap-4 p-8 md:grid-cols-4\">\n      {books.map((book) => (\n        <BookCard key={book.id} book={book} />\n      ))}\n    </main>\n  );\n}\n",
+    "components/BookCard.tsx": "import Link from \"next/link\";\nimport type { Book } from \"@/types/book\";\n\nexport function BookCard({ book }: { book: Book }) {\n  return (\n    <Link href={`/books/${book.id}`} className=\"rounded-xl border p-3 hover:shadow\">\n      {book.coverUrl ? (\n        <img src={book.coverUrl} alt={book.title} className=\"aspect-[2/3] rounded-md\" />\n      ) : (\n        <div className=\"aspect-[2/3] rounded-md bg-neutral-200\" />\n      )}\n      <h3 className=\"mt-2 font-semibold\">{book.title}</h3>\n      <p className=\"text-sm text-neutral-500\">{book.author}</p>\n    </Link>\n  );\n}\n",
+    "lib/auth.ts": "import { cookies } from \"next/headers\";\nimport { supabase } from \"@/lib/db\";\n\nexport type User = { id: string; email: string };\n\nexport async function getCurrentUser(): Promise<User | null> {\n  const token = (await cookies()).get(\"sb-access-token\")?.value;\n  if (!token) return null;\n\n  const { data, error } = await supabase.auth.getUser(token);\n  if (error || !data.user) return null;\n  if (!data.user.email_confirmed_at) return null;\n\n  return { id: data.user.id, email: data.user.email ?? \"\" };\n}\n",
+    "lib/covers.ts": "const COVERS_BASE = \"https://covers.openlibrary.org/b/isbn\";\n\nexport function coverUrlFor(isbn?: string | null): string | null {\n  if (!isbn) return null;\n  const clean = isbn.replace(/[^0-9X]/gi, \"\");\n  if (clean.length !== 10 && clean.length !== 13) return null;\n  return `${COVERS_BASE}/${clean}-M.jpg`;\n}\n",
+    "supabase/functions/cleanup-deleted/index.ts": "import { createClient } from \"npm:@supabase/supabase-js@2\";\n\nDeno.serve(async () => {\n  const supabase = createClient(\n    Deno.env.get(\"SUPABASE_URL\")!,\n    Deno.env.get(\"SUPABASE_SERVICE_ROLE_KEY\")!\n  );\n\n  const cutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();\n  const { data, error } = await supabase\n    .from(\"books\")\n    .delete()\n    .lt(\"deleted_at\", cutoff)\n    .select(\"id\");\n\n  if (error) return new Response(error.message, { status: 500 });\n\n  await fetch(Deno.env.get(\"MAIL_API_URL\")!, {\n    method: \"POST\",\n    body: JSON.stringify({ subject: \"Nightly cleanup\", removed: data.length }),\n  });\n\n  return new Response(JSON.stringify({ removed: data.length }));\n});\n"
+  },
+  "stats": {
+    "ms": 2822,
+    "llmCalls": 0
+  },
+  "setup": [],
+  "missing": [
+    {
+      "package": "@supabase/supabase-js",
+      "language": "typescript",
+      "listed": [
+        "package.json"
+      ]
+    },
+    {
+      "package": "next",
+      "language": "typescript",
+      "listed": [
+        "package.json"
+      ]
+    },
+    {
+      "package": "react",
+      "language": "typescript",
+      "listed": [
+        "package.json"
+      ]
+    }
+  ]
+}

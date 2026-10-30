@@ -1,0 +1,93 @@
+[
+  { "name": "bookshelf", "path": "samples/bookshelf", "what": "TypeScript: React with its own API routes" },
+  {
+    "name": "full-stack-fastapi-template",
+    "path": "spike/universal/fixtures/full-stack-fastapi-template",
+    "python": "spike/universal/fixtures/venv-fastapi/bin/python",
+    "repo": "https://github.com/fastapi/full-stack-fastapi-template",
+    "commit": "cb740b6",
+    "what": "Python FastAPI backend and a React frontend"
+  },
+  {
+    "name": "flask",
+    "path": "spike/universal/fixtures/flask",
+    "python": "spike/universal/fixtures/venv-flask/bin/python",
+    "repo": "https://github.com/pallets/flask",
+    "commit": "d73fa1c",
+    "what": "Python, a library with its tests and examples"
+  },
+  {
+    "name": "RookLift",
+    "path": "spike/universal/fixtures/RookLift",
+    "python": "spike/universal/fixtures/venv-rooklift/bin/python",
+    "repo": "https://github.com/dmvaldman/RookLift",
+    "commit": "0553e05",
+    "what": "Python scripts with Supabase"
+  },
+  {
+    "name": "suno2openai",
+    "path": "spike/universal/fixtures/suno2openai",
+    "python": "spike/universal/fixtures/venv-suno/bin/python",
+    "repo": "https://github.com/wlhtea/Suno2openai",
+    "commit": "2e63807",
+    "what": "Python FastAPI service whose lifespan starts APScheduler jobs; venv: fastapi, apscheduler<4, aiohttp, python-dotenv, requests, tenacity, aiomysql, uvicorn"
+  },
+  {
+    "name": "podcast-ranking",
+    "path": "spike/universal/fixtures/podcast-ranking",
+    "python": "spike/universal/fixtures/venv-podcast/bin/python",
+    "repo": "https://github.com/delineas/podcast-ranking-web-scraping",
+    "commit": "d57b3b1",
+    "what": "Python scripts and a Flask page, with a clock script of APScheduler jobs; venv: apscheduler<4, flask, requests, beautifulsoup4, lxml"
+  },
+  { "name": "taxonomy", "path": "spike/universal/fixtures/taxonomy", "repo": "https://github.com/shadcn-ui/taxonomy", "commit": "298a885", "what": "Next.js app router" },
+  { "name": "obytes", "path": "spike/universal/fixtures/obytes", "repo": "https://github.com/obytes/react-native-template-obytes", "commit": "fd9b358", "what": "Expo, React Native" },
+  { "name": "expo-clerk-convex", "path": "spike/universal/fixtures/expo-clerk-convex", "repo": "https://github.com/flemingvincent/expo-clerk-convex", "commit": "9486e47", "what": "Expo Router" },
+  {
+    "name": "compass_app",
+    "path": "spike/universal/fixtures/compass_app",
+    "repo": "https://github.com/flutter/samples",
+    "commit": "a05867d",
+    "folder": "compass_app",
+    "what": "Flutter (provider, go_router) and a Dart server; set up as spike/universal/RESULTS.md says"
+  },
+  {
+    "name": "next-saas-starter",
+    "path": "spike/universal/fixtures/next-saas-starter",
+    "repo": "https://github.com/leerob/next-saas-starter",
+    "commit": "6e33e58",
+    "what": "Next.js app router with server actions, Drizzle and Stripe"
+  },
+  {
+    "name": "realworld-fastapi",
+    "path": "spike/universal/fixtures/realworld-fastapi",
+    "python": "spike/universal/fixtures/venv-realworld/bin/python",
+    "repo": "https://github.com/nsidnev/fastapi-realworld-example-app",
+    "commit": "029eb77",
+    "what": "Python FastAPI service with asyncpg and SQL files; venv: fastapi 0.79, pydantic 1, databases, asyncpg, aiosql, pypika, alembic, pytest"
+  },
+  {
+    "name": "nextjs-with-supabase",
+    "path": "spike/universal/fixtures/nextjs-examples/examples/with-supabase",
+    "repo": "https://github.com/vercel/next.js",
+    "commit": "6e10728",
+    "folder": "examples/with-supabase",
+    "what": "Next.js with Supabase auth"
+  },
+  {
+    "name": "riverpod-todos",
+    "path": "spike/universal/fixtures/riverpod-todos",
+    "repo": "https://github.com/rrousselGit/riverpod",
+    "commit": "1efba1c",
+    "folder": "examples/todos",
+    "what": "Flutter with Riverpod and hooks, a to-do list; copied out of the repository's pub workspace, with `resolution: workspace` removed and the packages of the workspace set to `any`"
+  },
+  {
+    "name": "riverpod-marvel",
+    "path": "spike/universal/fixtures/riverpod-marvel",
+    "repo": "https://github.com/rrousselGit/riverpod",
+    "commit": "1efba1c",
+    "folder": "examples/marvel",
+    "what": "Flutter with Riverpod, hooks and an HTTP API (dio); copied out of the workspace like riverpod-todos"
+  }
+]

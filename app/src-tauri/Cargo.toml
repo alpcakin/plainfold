@@ -1,0 +1,18 @@
+[package]
+name = "plainfold-app"
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+repository = "https://github.com/alpcakin/plainfold"
+description = "plainfold desktop shell: reads a project with the core and shows its stories"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+plainfold-core = { path = "../../core" }
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+keyring = { version = "3", features = ["apple-native", "windows-native"] }

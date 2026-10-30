@@ -1,0 +1,23 @@
+[package]
+name = "plainfold-core"
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+repository = "https://github.com/alpcakin/plainfold"
+
+[dependencies]
+base64 = "0.23"
+flate2 = "1"
+ignore = "0.4.33"
+notify = "8.2.0"
+regex = "1.13.1"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+sha2 = "0.11"
+tar = "0.4"
+tree-sitter = "0.27.0"
+# the arrow-function fix of nielsenko/tree-sitter-dart#4 (not released yet; move to the release once it is)
+tree-sitter-dart = { git = "https://github.com/nielsenko/tree-sitter-dart", rev = "7ad3a3453d05f8ca30e7f95d3faa78ed3c6f1827" }
+tree-sitter-python = "0.25.0"
+tree-sitter-typescript = "0.23.2"
+ureq = "3"
