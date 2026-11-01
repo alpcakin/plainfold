@@ -2,7 +2,7 @@
 
 **Read a codebase as stories.** plainfold reads a project's source and shows what it does as sequence diagrams: what happens when a screen opens, a button is pressed, a request arrives or a job runs. Every step leads down to the lines that wrote it.
 
-[**Live demo**](https://alpcakin.github.io/plainfold/) (the real interface, in the browser, on four projects) · [Checks](https://github.com/alpcakin/plainfold/actions/workflows/ci.yml)
+[**Live demo**](https://alpcakin.github.io/plainfold/) (the real interface, in the browser, on four projects) · [How it was built with Claude Code](#how-i-worked-with-claude-code) · [Checks](https://github.com/alpcakin/plainfold/actions/workflows/ci.yml)
 
 <picture>
   <source srcset="docs/screenshots/story-dark.png" media="(prefers-color-scheme: dark)">
@@ -18,6 +18,15 @@
 - **Says what changed.** Two readings are compared like `git diff`, story by story. A renamed or moved function is matched by its code, so its story says "renamed from …" instead of showing one removed and one added.
 - **Leads down to the code.** The panel shows a step's call site and its definition, the rules that end it, and how many other stories reach it.
 - **Optional plain English.** A model can write one short sentence per step with the user's own key. Each sentence is checked against the code; one that fails is dropped and the code's own text stays.
+
+## How I worked with Claude Code
+
+plainfold was written with [Claude Code](https://claude.com/claude-code) as a pair: I decided what to build, set the rules the agent works by and checked its results. That setup is part of the repository:
+
+- **Rules, per folder.** [`CLAUDE.md`](CLAUDE.md), and one each in [`core/`](core/CLAUDE.md), [`app/`](app/CLAUDE.md) and [`spike/`](spike/CLAUDE.md). They hold what an agent gets wrong over many sessions on one codebase. The main rule is against overfitting: no file, function or framework name in a heuristic, and every fix checked on two unrelated projects. Others: type-checking is not verification, a gap stays visible instead of guessed, private code never reaches a commit.
+- **Checks before "done".** [`core/scripts/check.mjs`](core/scripts/check.mjs) reads 15 projects with the last commit's core and with the change, and prints every story that differs. The agent reads each difference and reports it. The [`look`](.claude/skills/look/SKILL.md) skill takes screenshots of the view in four looks (light and dark, macOS and Windows) after every view change.
+- **A decision log.** [`DECISIONS.md`](DECISIONS.md) labels every product decision Decided, Proposed, Built or Open. The agent can propose and build; only I mark a decision Decided. It is rewritten when a decision changes, so it says what is true now. [`TODO.md`](TODO.md) is what is left.
+- **One way to commit.** The [`commit`](.claude/skills/commit/SKILL.md) skill updates the decision log, the to-do list and the READMEs in the same commit as the code, runs the checks the change touches, and writes the message in the repository's style.
 
 ## What a diagram promises
 
@@ -93,8 +102,6 @@ Dart needs `dart` on the PATH and `flutter pub get` run in the project. More com
 ## Status
 
 plainfold is no longer in active development. It works on the languages and frameworks above, but I stopped building it as a product. Static extraction is deterministic, yet the choices behind it are not: where a story starts, what it includes, and how each framework's conventions should read are judgment calls. There is no ground truth to measure a diagram against, so every framework and every new project brings new cases. The repository stays as it was, with its decisions and open questions written down.
-
-It was built with [Claude Code](https://claude.com/claude-code). The `CLAUDE.md` files hold the working rules, among them the one against fitting fixes to a single project.
 
 ## Repository
 
